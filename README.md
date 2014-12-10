@@ -1,4 +1,3 @@
-bigdict
-=======
-
-The Python Dict with a big D
+- [ ] What happens if we instantiate with a dictionary
+- [ ] What happens when we do a.b.c.d = {2: 3}
+- [ ] Move code out of __setattr__?
