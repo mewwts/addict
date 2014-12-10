@@ -90,3 +90,46 @@ class Dict(dict):
             self._set_both(name, {})
             return super(Dict, self).__getitem__(name)
 
+    def __delattr__(self, name):
+        """
+        Is invoked when del some_instance_of_Dict.b is called.
+
+        """
+        self._delete(name)
+
+    def __delitem__(self, name):
+        """
+        Is invoked when del some_instance_of_Dict[b] is called.
+
+        """
+        self._delete(name)
+
+    def _delete(self, name):
+        """
+        Deletes both the attribute and item associated with 'name'
+
+        """
+        super(Dict, self).__delitem__(name)
+        super(Dict, self).__delattr__(name)
+
+    def prune(self):
+        """
+        Removes all empty Dicts inside the Dict.
+        E.g
+        >>> a = Dict()
+        >>> a.b.c.d
+        {}
+        >>> a.a = 2
+        >>> a
+        {'a': 2, 'b': {'c': {'d': {}}}}
+        >>> a.prune()
+        >>> a
+        {'a': 2}
+        """
+        for key, val in self.items():
+            if not val:
+                self._delete(key)
+            elif isinstance(val, dict):
+                val.prune()
+                self._delete(key)
+

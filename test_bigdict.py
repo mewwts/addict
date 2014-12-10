@@ -66,3 +66,35 @@ class Tests(unittest.TestCase):
         prop_json = json.dumps(prop)
         self.assertEqual(some_json, prop_json)
 
+    def test_delitem(self):
+        prop = Dict({'a': 2})
+        del prop['a']
+        self.assertDictEqual(prop, {})
+
+    def test_delitem_nested(self):
+        prop = Dict(TEST_DICT)
+        del prop['a']['b']['c']
+        self.assertDictEqual(prop, {'a': {'b': {}}})
+
+    def test_delattr(self):
+        prop = Dict({'a': 2})
+        del prop.a
+        self.assertDictEqual(prop, {})
+
+    def test_delattr_nested(self):
+        prop = Dict(TEST_DICT)
+        del prop.a.b.c
+        self.assertDictEqual(prop, {'a': {'b': {}}})
+
+    def test_delitem_delattr(self):
+        prop = Dict(TEST_DICT)
+        del prop.a['b']
+        self.assertDictEqual(prop, {'a': {}})
+
+    def test_prune(self):
+        prop = Dict()
+        prop.a.b.c.d
+        prop.b
+        prop.c = 2
+        prop.prune()
+        self.assertDictEqual(prop, {'c': 2})
