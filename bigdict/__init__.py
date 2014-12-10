@@ -1,7 +1,7 @@
-from .big_dict import Dict
+from .bigdict import Dict
 
 
-__title__ = 'Dict'
+__title__ = 'bigdict'
 __version__ = '0.0.1'
 __author__ = 'Mats Julian Olsen'
 __license__ = 'MIT'

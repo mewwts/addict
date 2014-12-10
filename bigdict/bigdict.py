@@ -28,7 +28,6 @@ class Dict(dict):
 	"""
 	def __init__(self, *args, **kwargs):
 		super(Dict, self).__init__(*args, **kwargs)
-		print args
 		if (args and isinstance(args[0], dict)):
 			for key, val in args[0].iteritems():
 				self[key] = val
