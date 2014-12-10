@@ -27,17 +27,32 @@ class Dict(dict):
 
     """
     def __init__(self, *args, **kwargs):
-        super(Dict, self).__init__(*args, **kwargs)
+        """
+        If we're initialized with a dict, make sure we turn all the
+        subdicts into Dicts as well.
+
+        """
         if (args and isinstance(args[0], dict)):
             for key, val in args[0].iteritems():
-                self[key] = val
+                self._set_both(key, val)
 
     def __setattr__(self, name, value):
-        if isinstance(value, dict):
-            value = self.__class__(value)
+        """
+        setattr is called when the syntax a.b = 2 is used to set a value.
+
+        """
         self._set_both(name, value)
 
     def _set_both(self, name, value):
+        """
+        This method does the 'heavy' lifting here. If value is an instance
+        of dict, it will be turned into a Dict (Yay!). If name is a string,
+        it can be set as a property. If name is not in the Dict already,
+        we put it in :-)
+
+        """
+        if isinstance(value, dict):
+            value = self.__class__(value)
         if isinstance(name, str):
             super(Dict, self).__setattr__(name, value)
         if name not in self:
@@ -47,9 +62,8 @@ class Dict(dict):
         """
         This is called when trying to set a value of the Dict using [].
         E.g. some_instance_of_Dict['b'] = val. If 'val
+
         """
-        if isinstance(value, dict):
-            value = self.__class__(value)
         self._set_both(name, value)
 
     def __getattr__(self, name):
@@ -59,8 +73,7 @@ class Dict(dict):
         is the defaultdict-like part.
 
         """
-        val = self.__class__()
-        self._set_both(name, val)
+        self._set_both(name, {})
         return super(Dict, self).__getattribute__(name)
 
     def __getitem__(self, name):
@@ -74,8 +87,6 @@ class Dict(dict):
         if name in self:
             return super(Dict, self).__getitem__(name)
         else:
-            val = self.__class__()
-            self._set_both(name, val)
-            # self.__setitem__(name, val)
+            self._set_both(name, {})
             return super(Dict, self).__getitem__(name)
 
