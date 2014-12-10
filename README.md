@@ -4,8 +4,7 @@ Usage:
 ```Python
 from bigdict import Dict
 my_new_shiny_dict = Dict()
-
-'''
+```
 
 
 The list:
