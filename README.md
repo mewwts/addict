@@ -40,7 +40,17 @@ body.query.filtered.query.match.title = 'Mats'
 body.query.filtered.filter.range.created_at = {'from': 'now-8d', 'to': 'now-1d'}
 my_hist = {'field': 'created_at', 'interval': '1d', 'min_doc_count': 0}
 body.aggs.my_agg.date_histogram = my_hist
-
 ```
 
-As it is essentially a ```dict```, it will also serialize into JSON perfectly. Ready for use with all other libraries. 
+As it is essentially a ```dict```, it will also serialize into JSON perfectly. Ready for use with hopefully all other libraries. If you by mistake added some empty Dicts in your Dict, you can recursively delete those by running .prune() on your Dict.
+```Python
+>>> a = Dict()
+>>> a.a = 2
+>>> a.b.c.d.e
+{}
+>>> a
+{'a': 2, 'b': {'c': 'd': {'e': {}}}}
+>>> a.prune()
+{'a': 2}
+```
+Could be useful, for example when constructing queries!
