@@ -27,7 +27,8 @@ body = {}
 filtered = {'filtered': {'query': {}, 'filter': {}}}
 filtered['filtered']['query'] = {'match_all': {}}
 filtered['filtered']['filter'] = {'range': 'created_at': {'to': 'now - 1h'}}
-aggs = {'my_agg': {'date_histogram': {'field': 'created_at', 'interval': '2h', 'min_doc_count': 0}}}
+my_hist = {'field': 'created_at', 'interval': '2h', 'min_doc_count': 0}
+aggs = {'my_agg': {'date_histogram': my_hist}}
 body['query'] = filtered
 body[aggs] = aggs
 
@@ -37,6 +38,7 @@ You can now write
 body = Dict()
 body.query.filtered.query.match_all = {}
 body.query.filtered.filter.range.created_at.to = 'now - 1h'
-body.aggs.my_agg.date_histogram = {'field': 'created_at', 'interval': '2h', 'min_doc_count': 0}
+my_hist = {'field': 'created_at', 'interval': '2h', 'min_doc_count': 0}
+body.aggs.my_agg.date_histogram = my_hist
 
 ```
