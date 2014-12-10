@@ -33,7 +33,7 @@ class Dict(dict):
 
         """
         if (args and isinstance(args[0], dict)):
-            for key, val in args[0].iteritems():
+            for key, val in args[0].items():
                 self._set_both(key, val)
 
     def __setattr__(self, name, value):
@@ -126,7 +126,7 @@ class Dict(dict):
         >>> a
         {'a': 2}
         """
-        for key, val in self.items():
+        for key, val in list(self.items()):
             if not val:
                 self._delete(key)
             elif isinstance(val, dict):
