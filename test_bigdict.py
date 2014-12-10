@@ -47,6 +47,10 @@ class Tests(unittest.TestCase):
         prop = Dict(TEST_DICT)
         self.assertEqual(prop['a']['b']['c'], TEST_VAL)
 
+    def test_getattr(self):
+        prop = Dict(TEST_DICT)
+        self.assertEqual(prop.a.b.c, TEST_VAL)
+
     def test_isinstance(self):
         self.assertTrue(isinstance(Dict(), dict))
 
