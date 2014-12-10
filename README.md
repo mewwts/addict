@@ -21,24 +21,24 @@ You may also mix the two syntaxes:
 ```
 When is this **especially** useful? 
 
-This package rose from the entirely tiresome creation of elasticsearch queries. When you before were writing
+This package rose from the entirely tiresome creation of elasticsearch queries. When you before were writing something like
 ```Python
 body = {}
 filtered = {'filtered': {'query': {}, 'filter': {}}}
-filtered['filtered']['query'] = {'match_all': {}}
-filtered['filtered']['filter'] = {'range': 'created_at': {'to': 'now - 1h'}}
-my_hist = {'field': 'created_at', 'interval': '2h', 'min_doc_count': 0}
+filtered['filtered']['query'] = {'match': {'title: 'Mats'}}
+filtered['filtered']['filter'] = {'range': 'created_at': {'to': 'now-1d', 'from': 'now-8d'}}
+my_hist = {'field': 'created_at', 'interval': '1d', 'min_doc_count': 0}
 aggs = {'my_agg': {'date_histogram': my_hist}}
 body['query'] = filtered
 body[aggs] = aggs
 
 ```
-You can now write 
+You can now write something like this
 ```Python
 body = Dict()
-body.query.filtered.query.match_all = {}
-body.query.filtered.filter.range.created_at.to = 'now - 1h'
-my_hist = {'field': 'created_at', 'interval': '2h', 'min_doc_count': 0}
+body.query.filtered.query.match.title = 'Mats'
+body.query.filtered.filter.range.created_at = {'from': 'now-8d', 'to': 'now-1d'}
+my_hist = {'field': 'created_at', 'interval': '1d', 'min_doc_count': 0}
 body.aggs.my_agg.date_histogram = my_hist
 
 ```
