@@ -42,3 +42,5 @@ my_hist = {'field': 'created_at', 'interval': '2h', 'min_doc_count': 0}
 body.aggs.my_agg.date_histogram = my_hist
 
 ```
+
+As it is essentially a ```dict```, it will also serialize into JSON perfectly. Ready for use with all other libraries. 
