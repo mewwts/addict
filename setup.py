@@ -3,14 +3,14 @@ try:
 except ImportError:
     from distutils.core import setup
 
-import bigdict
+import addict
 
 setup(
-    name='bigdict',
-    version=bigdict.__version__,
-    packages=['bigdict'],
-    url='https://github.com/mewwts/bigdict',
-    author=bigdict.__author__,
+    name='addict',
+    version=addict.__version__,
+    packages=['addict'],
+    url='https://github.com/mewwts/addict',
+    author=addict.__author__,
     author_email='mats@plysjbyen.net',
     classifiers=(
         'Programming Language :: Python',

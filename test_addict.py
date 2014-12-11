@@ -1,6 +1,6 @@
 import json
 import unittest
-from bigdict import Dict
+from addict import Dict
 
 TEST_VAL = [1, 2, 3]
 TEST_DICT = {'a': {'b': {'c': TEST_VAL}}}
