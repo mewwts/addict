@@ -1,4 +1,4 @@
-# addict - the Python dict with the big D.
+# addict - the Python Dict that you'll love more than r/cats.
 
 addict is a Python package that gives you a dictionary who's keys are BOTH gettable and settable using the get- and set attribute syntax, as well as the get- and setitem syntax. This is awesome because you may do the following:
 
