@@ -1,0 +1,27 @@
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
+import bigdict
+
+setup(
+    name='bigdict',
+    version=bigdict.__version__,
+    packages=['bigdict'],
+    url='https://github.com/mewwts/bigdict',
+    author=bigdict.__author__,
+    author_email='mats@plysjbyen.net',
+    classifiers=(
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Development Status :: 3'
+    )
+)
