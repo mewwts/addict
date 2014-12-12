@@ -23,5 +23,6 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Development Status :: 3'
-    )
+    ),
+    description='A Python Dict whos keys can be set both using attribute and item syntax'
 )
