@@ -131,3 +131,10 @@ class Tests(unittest.TestCase):
         prop.a[0].b.c = 2
         prop.prune()
         self.assertDictEqual(prop, {'a': [{'b': {'c': 2}}]})
+
+    def test_prune_list(self):
+        l = [Dict(), Dict(), Dict()]
+        l[0].a.b = 2
+        l1 = Dict._prune_list(l)
+        self.assertSequenceEqual(l1, [{'a': {'b': 2}}])
+

@@ -4,6 +4,8 @@ python:
     - "3.3"
     - "3.4"
 before_script: pip install coveralls
-script: "py.test"
+script: 
+    - "py.test"
+    - "coverage run --source=addict setup.py test"
 after_success:
     - coveralls
