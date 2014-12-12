@@ -138,3 +138,22 @@ class Tests(unittest.TestCase):
         l1 = Dict._prune_list(l)
         self.assertSequenceEqual(l1, [{'a': {'b': 2}}])
 
+    def test_prune_not_new_list(self):
+        prop = Dict()
+        prop.a.b = []
+        prop.b = 2
+        prop.prune()
+        self.assertDictEqual(prop, {'b': 2})
+
+    def test_list_reduce(self):
+        prop = Dict()
+        prop.a = [Dict(), 1, 2]
+        prop.a[0].b.c
+        prop.prune()
+        self.assertDictEqual(prop, {'a': [1, 2]})
+
+    def test_list_reduce_nested_list(self):
+        prop = Dict()
+        prop.a = [Dict(), [[]], [1,2,3]]
+        prop.prune()
+        self.assertDictEqual(prop, {'a': [[1,2,3]]})

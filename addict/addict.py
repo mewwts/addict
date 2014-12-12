@@ -125,10 +125,7 @@ class Dict(dict):
                     self._delete(key)
             elif isinstance(val, list):
                 new_list = self._prune_list(val)
-                if not new_list:
-                    self._delete(key)
-                else:
-                    self._set_both(key, new_list)
+                self._set_both(key, new_list)
 
     @classmethod
     def _prune_list(cls, some_list):
@@ -143,15 +140,16 @@ class Dict(dict):
             if not item:
                 return False
         elif isinstance(item, list):
-            cls._prune_list(item)
-            if not item:
+            new_item = cls._prune_list(item)
+            if not new_item:
                 return False
         return True
 
 
     def prune(self):
         """
-        Removes all empty Dicts inside the Dict.
+        Removes all empty Dicts and falsy stuff inside the Dict.
+        0 vals are allowed for now.
         E.g
         >>> a = Dict()
         >>> a.b.c.d
