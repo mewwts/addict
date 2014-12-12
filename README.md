@@ -78,5 +78,5 @@ This module rose from the entirely tiresome creation of elasticsearch queries in
 ###Perks
 As it is essentially a ```dict```, it will also serialize into JSON perfectly. Ready for use with hopefully all other libraries that handles dicts.
 
-###Testemonials
+###Testimonials
 @spiritsack - *"Mother of God, this changes everything."*
