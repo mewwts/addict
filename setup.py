@@ -23,5 +23,6 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Development Status :: 3'
-    )
+    ),
+    description='A Python Dict (written with) a big D.',
 )
