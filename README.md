@@ -1,4 +1,9 @@
-# addict - the Python Dict that you'll love more than r/cats.
+# addict - the Python Dict that's more addictive than heroin.
+
+To install simply type
+```sh
+pip install addict
+```
 
 addict is a Python package that gives you a dictionary who's keys are BOTH gettable and settable using the get- and set attribute syntax, as well as the get- and setitem syntax. This is awesome because you may do the following:
 
