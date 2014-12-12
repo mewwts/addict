@@ -1,5 +1,5 @@
 # addict - the Python Dict that's more addictive than heroin.
-
+[![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict)
 To install simply type
 ```sh
 pip install addict
