@@ -59,3 +59,4 @@ As it is essentially a ```dict```, it will also serialize into JSON perfectly. R
 {'a': 2}
 ```
 Could be useful, for example when constructing queries!
+This changes everything!
