@@ -116,8 +116,7 @@ class Dict(dict):
         Recursively remove falsy items from the Dict.
 
         """
-        for key, val in self.items():
-            print key, val
+        for key, val in list(self.items()):
             if (not val) and (val != 0):
                 self._delete(key)
             elif isinstance(val, Dict):
@@ -125,9 +124,7 @@ class Dict(dict):
                 if not val:
                     self._delete(key)
             elif isinstance(val, list):
-                print val
                 new_list = self._prune_list(val)
-                print new_list
                 if not new_list:
                     self._delete(key)
                 else:
