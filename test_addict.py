@@ -98,3 +98,36 @@ class Tests(unittest.TestCase):
         prop.c = 2
         prop.prune()
         self.assertDictEqual(prop, {'c': 2})
+
+    def test_prune_nested(self):
+        prop = Dict(TEST_DICT)
+        prop.b.c.d
+        prop.d
+        prop.prune()
+        self.assertDictEqual(prop, TEST_DICT)
+
+    def test_prune_empty_list(self):
+        prop = Dict(TEST_DICT)
+        prop.b.c = []
+        prop.prune()
+        self.assertDictEqual(prop, TEST_DICT)
+
+    def test_prune_shared_key(self):
+        prop = Dict(TEST_DICT)
+        prop.a.b.d
+        prop.prune()
+        self.assertDictEqual(prop, TEST_DICT)
+
+    def test_prune_dont_remove_zero(self):
+        prop = Dict()
+        prop.a = 0
+        prop.b.c
+        prop.prune()
+        self.assertDictEqual(prop, {'a': 0})
+
+    def test_prune_with_list(self):
+        prop = Dict()
+        prop.a = [Dict(), Dict(), Dict()]
+        prop.a[0].b.c = 2
+        prop.prune()
+        self.assertDictEqual(prop, {'a': [{'b': {'c': 2}}]})

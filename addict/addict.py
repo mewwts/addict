@@ -55,7 +55,6 @@ class Dict(dict):
             value = self.__class__(value)
         if isinstance(name, str):
             super(Dict, self).__setattr__(name, value)
-        if name not in self:
             super(Dict, self).__setitem__(name, value)
 
     def __setitem__(self, name, value):
@@ -112,6 +111,47 @@ class Dict(dict):
         super(Dict, self).__delitem__(name)
         super(Dict, self).__delattr__(name)
 
+    def _prune(self):
+        """
+        Recursively remove falsy items from the Dict.
+
+        """
+        for key, val in self.items():
+            print key, val
+            if (not val) and (val != 0):
+                self._delete(key)
+            elif isinstance(val, Dict):
+                val._prune()
+                if not val:
+                    self._delete(key)
+            elif isinstance(val, list):
+                print val
+                new_list = self._prune_list(val)
+                print new_list
+                if not new_list:
+                    self._delete(key)
+                else:
+                    self._set_both(key, new_list)
+
+    @classmethod
+    def _prune_list(cls, some_list):
+        return [x for x in some_list if cls._list_reduce(x)]
+
+    @classmethod
+    def _list_reduce(cls, item):
+        if not item:
+            return False
+        elif isinstance(item, Dict):
+            item.prune()
+            if not item:
+                return False
+        elif isinstance(item, list):
+            cls._prune_list(item)
+            if not item:
+                return False
+        return True
+
+
     def prune(self):
         """
         Removes all empty Dicts inside the Dict.
@@ -126,10 +166,4 @@ class Dict(dict):
         >>> a
         {'a': 2}
         """
-        for key, val in list(self.items()):
-            if not val:
-                self._delete(key)
-            elif isinstance(val, dict):
-                val.prune()
-                self._delete(key)
-
+        self._prune()
