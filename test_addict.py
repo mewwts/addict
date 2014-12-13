@@ -163,3 +163,13 @@ class Tests(unittest.TestCase):
         prop[(1, 2)] = 2
         self.assertDictEqual(prop, {(1, 2): 2})
         self.assertEqual(prop[(1, 2)], 2)
+
+    def test_set_keyerror(self):
+        prop = Dict({'a': 3})
+        def setval():
+            prop.keys = 4
+        self.assertRaises(AttributeError, setval)
+
+    def test_keys(self):
+        prop = Dict({'a':3})
+        self.assertEquals(list(prop.keys()), ['a'])

@@ -1,3 +1,5 @@
+from types import BuiltinMethodType
+
 class Dict(dict):
     """
     Dict is a subclass of dict, which allows you to get AND SET(!!)
@@ -39,8 +41,12 @@ class Dict(dict):
     def __setattr__(self, name, value):
         """
         setattr is called when the syntax a.b = 2 is used to set a value.
+        when the name conflicts with a builtin method such as a.items,
+        a KeyError is thrown
 
         """
+        if isinstance(getattr(super(Dict, self), name, None), BuiltinMethodType):
+            raise AttributeError("'Dict' object attribute '%s' is read-only" % name)
         self.__setitem__(name, value)
 
     def __setitem__(self, name, value):
@@ -108,7 +114,6 @@ class Dict(dict):
             if not new_item:
                 return False
         return True
-
 
     def prune(self):
         """
