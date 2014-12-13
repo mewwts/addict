@@ -60,10 +60,6 @@ class Dict(dict):
         super(Dict, self).__setitem__(name, value)
 
     def __getattr__(self, item):
-        from types import BuiltinMethodType
-        attr = getattr(super(Dict, self), item, None)
-        if isinstance(attr, BuiltinMethodType):
-            return attr
         return self.__getitem__(item)
 
     def __getitem__(self, name):

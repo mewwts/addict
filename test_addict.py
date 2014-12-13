@@ -171,7 +171,5 @@ class Tests(unittest.TestCase):
         self.assertRaises(KeyError, setval)
 
     def test_keys(self):
-        from types import BuiltinMethodType
         prop = Dict({'a':3})
         self.assertEquals(list(prop.keys()), ['a'])
-        self.assertTrue(isinstance(prop.keys, BuiltinMethodType))
