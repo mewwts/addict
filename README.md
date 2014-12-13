@@ -39,7 +39,7 @@ Working with dictionaries have never been more awesome than this! Setting the it
 >>> my_new_shiny_dict = Dict()
 >>> my_new_shiny_dict.a.b.c.d.e = 2
 >>> my_new_shiny_dict
-{'a': {'b': {'c': 'd': {'e': 2}}}}
+{'a': {'b': {'c': {'d': {'e': 2}}}}}
 ```
 
 ###Pruning
@@ -51,7 +51,7 @@ So trying to peek at an empty item will result in
 >>> my_dict.b.c.d.e
 {}
 >>> my_dict
-{'a': 2, 'b': {'c': 'd': {'e': {}}}}
+{'a': 2, 'b': {'c': {'d': {'e': {}}}}}
 ```
 But don't you worry, if you by mistake added some empty Dicts in your Dict, you can recursively delete those by running .prune() on your Dict
 ```Python
@@ -64,7 +64,7 @@ Also, remember that ```int```s are not valid attribute names, so keys of the dic
 >>> my_other_shiny_dict = Dict()
 >>> my_other_shiny_dict.a.b.c.d.e = 2
 >>> my_other_shiny_dict[2] = [1, 2, 3]
-{2: [1, 2, 3], 'a': {'b': {'c': 'd': {'e': 2}}}}
+{2: [1, 2, 3], 'a': {'b': {'c': {'d': {'e': 2}}}}}
 ```
 However feel free to mix the two syntaxes:
 ```Python
