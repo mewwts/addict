@@ -8,6 +8,11 @@ TEST_DICT_STR = str(TEST_DICT)
 
 class Tests(unittest.TestCase):
 
+    def test_constructor(self):
+        some_dict = {'a': TEST_VAL}
+        prop = Dict(a=TEST_VAL)
+        self.assertDictEqual(prop, some_dict)
+
     def test_set_one_level_item(self):
         some_dict = {'a': TEST_VAL}
         prop = Dict()
