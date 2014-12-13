@@ -64,29 +64,20 @@ class Dict(dict):
         the attr and item to a new instance of Dict.
 
         """
-        if name in self:
-            return super(Dict, self).__getitem__(name)
-        else:
+        if name not in self:
             self.__setitem__(name, {})
-            return super(Dict, self).__getitem__(name)
+        return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
         """
         Is invoked when del some_instance_of_Dict.b is called.
 
         """
-        self._delete(name)
+        self.__delitem__(name)
 
     def __delitem__(self, name):
         """
         Is invoked when del some_instance_of_Dict[b] is called.
-
-        """
-        self._delete(name)
-
-    def _delete(self, name):
-        """
-        Deletes both the attribute and item associated with 'name'
 
         """
         super(Dict, self).__delitem__(name)
@@ -98,11 +89,11 @@ class Dict(dict):
         """
         for key, val in list(self.items()):
             if (not val) and (val != 0):
-                self._delete(key)
+                self.__delitem__(key)
             elif isinstance(val, Dict):
                 val._prune()
                 if not val:
-                    self._delete(key)
+                    self.__delitem__(key)
             elif isinstance(val, list):
                 new_list = self._prune_list(val)
                 self[key] = new_list
