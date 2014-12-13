@@ -75,6 +75,12 @@ class Dict(dict):
         """
         self.__delitem__(name)
 
+    def _ipython_display_(self):
+        print(str(self))
+
+    def _repr_html_(self):
+        return str(self)
+
     def _prune(self):
         """
         Recursively remove falsy items from the Dict.
