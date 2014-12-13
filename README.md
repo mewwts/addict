@@ -46,34 +46,46 @@ Working with dictionaries have never been more awesome than this! Setting the it
 It behaves much like a defaultdict, in the way that trying to get a nonexistent key will return a new, empty Dict instance.
 So trying to peek at an empty item will result in
 ```Python
->>> my_dict = Dict()
->>> my_dict.a = 2
->>> my_dict.b.c.d.e
+>>> addicted = Dict()
+>>> addicted.a = 2
+>>> addicted.b.c.d.e
 {}
->>> my_dict
+>>> addicted
 {'a': 2, 'b': {'c': {'d': {'e': {}}}}}
 ```
 But don't you worry, if you by mistake added some empty Dicts in your Dict, you can recursively delete those by running .prune() on your Dict
 ```Python
->>> my_dict.prune()
+>>> addicted.prune()
 {'a': 2}
 ```
-
+### Stuff to keep in mind
 Also, remember that ```int```s are not valid attribute names, so keys of the dict that are not strings must be set/get with the get-/setitem syntax
 ```Python
->>> my_other_shiny_dict = Dict()
->>> my_other_shiny_dict.a.b.c.d.e = 2
->>> my_other_shiny_dict[2] = [1, 2, 3]
+>>> addicted = Dict()
+>>> addicted.a.b.c.d.e = 2
+>>> addicted[2] = [1, 2, 3]
 {2: [1, 2, 3], 'a': {'b': {'c': {'d': {'e': 2}}}}}
 ```
 However feel free to mix the two syntaxes:
 ```Python
->>> my_other_shiny_dict.a.b['c'].d.e
+>>> addicted.a.b['c'].d.e
 2
 ```
+###Attributes like keys, items etc.
+addict will not let you override attributes that are native to ```dict```, so the following will not work
+```Python
+>>> iama_addict = Dict()
+>>> iama_addict.keys = 2
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "addict/addict.py", line 53, in __setattr__
+    raise AttributeError("'Dict' object attribute '%s' is read-only" % name)
+AttributeError: 'Dict' object attribute 'keys' is read-only
+```
+
 ###When is this **especially** useful? 
 
-This module rose from the entirely tiresome creation of elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use a *Dict* instead.
+This module rose from the entirely tiresome creation of elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
 
 ###Perks
 As it is essentially a ```dict```, it will also serialize into JSON perfectly. Ready for use with hopefully all other libraries that handles dicts.
