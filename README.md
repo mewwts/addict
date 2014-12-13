@@ -1,7 +1,7 @@
 # addict - the Python Dict that's better than heroin.
 [![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict)
 
-addict is a Python module that gives you a dictionary whos values are both gettable and settable using both attribute and getitem syntax. 
+addict is a Python module that gives you a dictionary whose values are both gettable and settable using both attribute and getitem syntax.
 
 **Never again will you have to write code like this**:
 ```Python
@@ -31,7 +31,7 @@ To install simply type
 pip install addict
 ```
 ###Usage
-addict inherits from ```dict```, but is way more flexible in terms of accessing and setting it's values. 
+addict inherits from ```dict```, but is way more flexible in terms of accessing and setting its values.
 Working with dictionaries have never been more awesome than this! Setting the items of a nested Dict is a *dream*:
 
 ```Python
