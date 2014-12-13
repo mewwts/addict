@@ -163,3 +163,8 @@ class Tests(unittest.TestCase):
         prop[(1, 2)] = 2
         self.assertDictEqual(prop, {(1, 2): 2})
         self.assertEqual(prop[(1, 2)], 2)
+
+    def test_repr_html(self):
+        prop = Dict()
+        prop.a.b.c = TEST_VAL
+        self.assertEqual(prop._repr_html_(), TEST_DICT_STR)
