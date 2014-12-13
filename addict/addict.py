@@ -92,7 +92,7 @@ class Dict(dict):
         super(Dict, self).__delitem__(name)
 
     def _ipython_display_(self):
-        print str(self)
+        print(str(self))
 
     def _repr_html_(self):
         return str(self)
