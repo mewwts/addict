@@ -1,3 +1,5 @@
+from types import BuiltinMethodType
+
 class Dict(dict):
     """
     Dict is a subclass of dict, which allows you to get AND SET(!!)
@@ -43,10 +45,8 @@ class Dict(dict):
         a KeyError is thrown
 
         """
-        from types import BuiltinMethodType
         if isinstance(getattr(super(Dict, self), name, None), BuiltinMethodType):
-            print("You are trying to override a builtin method")
-            raise KeyError("Do not use a reserved attr")
+            raise AttributeError("'Dict' object attribute %s is read-only" % name)
         self.__setitem__(name, value)
 
     def __setitem__(self, name, value):
