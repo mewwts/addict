@@ -157,3 +157,9 @@ class Tests(unittest.TestCase):
         prop.a = [Dict(), [[]], [1,2,3]]
         prop.prune()
         self.assertDictEqual(prop, {'a': [[1,2,3]]})
+
+    def test_tuple_key(self):
+        prop = Dict()
+        prop[(1, 2)] = 2
+        self.assertDictEqual(prop, {(1, 2): 2})
+        self.assertEqual(prop[(1, 2)], 2)
