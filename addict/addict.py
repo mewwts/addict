@@ -39,8 +39,14 @@ class Dict(dict):
     def __setattr__(self, name, value):
         """
         setattr is called when the syntax a.b = 2 is used to set a value.
+        when the name conflicts with a builtin method such as a.items,
+        a KeyError is thrown
 
         """
+        from types import BuiltinMethodType
+        if isinstance(getattr(super(Dict, self), name, None), BuiltinMethodType):
+            print("You are trying to override a builtin method")
+            raise KeyError("Do not use a reserved attr")
         self.__setitem__(name, value)
 
     def __setitem__(self, name, value):
@@ -54,6 +60,10 @@ class Dict(dict):
         super(Dict, self).__setitem__(name, value)
 
     def __getattr__(self, item):
+        from types import BuiltinMethodType
+        attr = getattr(super(Dict, self), item, None)
+        if isinstance(attr, BuiltinMethodType):
+            return attr
         return self.__getitem__(item)
 
     def __getitem__(self, name):
@@ -124,7 +134,6 @@ class Dict(dict):
             if not new_item:
                 return False
         return True
-
 
     def prune(self):
         """
