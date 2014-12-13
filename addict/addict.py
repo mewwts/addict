@@ -115,7 +115,8 @@ class Dict(dict):
     @classmethod
     def _prune_list(cls, some_list, pruneZeros, pruneLists):
         l = [cls._list_reduce(x, pruneZeros, pruneLists) for x in some_list]
-        return [x for x in l if not x is None]
+        l = [x for x in l if not x is None]
+        return l
 
     @classmethod
     def _list_reduce(cls, item, pruneZeros, pruneLists):
@@ -132,10 +133,11 @@ class Dict(dict):
                 return None
         elif isinstance(item, list):
             new_item = cls._prune_list(item, pruneZeros, pruneLists)
-            if pruneLists and not new_item:
-                return None
-            else:
-                return list()
+            if not new_item:
+                if pruneLists:
+                    return None
+                else:
+                    return new_item
         return item
 
 
