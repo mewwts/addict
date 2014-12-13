@@ -161,7 +161,7 @@ class Tests(unittest.TestCase):
     def test_prune_list(self):
         l = [Dict(), Dict(), Dict()]
         l[0].a.b = 2
-        l1 = Dict._prune_list(l)
+        l1 = Dict._prune_list(l, False, True)
         self.assertSequenceEqual(l1, [{'a': {'b': 2}}])
 
     def test_prune_not_new_list(self):
@@ -208,3 +208,5 @@ class Tests(unittest.TestCase):
         self.assertRaises(AttributeError, set_items)
         self.assertDictEqual(prop, {})
 
+if __name__ == '__main__':
+    unittest.main()

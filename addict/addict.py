@@ -141,7 +141,7 @@ class Dict(dict):
         return item
 
 
-    def prune(self, pruneZeros=False, pruneLists=False):
+    def prune(self, pruneZeros=False, pruneLists=True):
         """
         Removes all empty Dicts and falsy stuff inside the Dict.
         If the user specifies pruneZeros, then 0s are pruned from the Dict.
