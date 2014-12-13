@@ -35,6 +35,9 @@ class Dict(dict):
         if (args and isinstance(args[0], dict)):
             for key, val in args[0].items():
                 self._set_both(key, val)
+        
+        for key, val in kwargs.items():
+                self._set_both(key, val)
 
     def __setattr__(self, name, value):
         """
