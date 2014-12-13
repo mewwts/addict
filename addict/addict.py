@@ -75,13 +75,6 @@ class Dict(dict):
         """
         self.__delitem__(name)
 
-    def __delitem__(self, name):
-        """
-        Is invoked when del some_instance_of_Dict[b] is called.
-
-        """
-        super(Dict, self).__delitem__(name)
-
     def _prune(self):
         """
         Recursively remove falsy items from the Dict.
