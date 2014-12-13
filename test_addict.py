@@ -171,6 +171,24 @@ class Tests(unittest.TestCase):
         prop.prune()
         self.assertDictEqual(prop, {'b': 2})
 
+    def test_prune_zeros(self):
+        prop = Dict()
+        prop.a.b = 0
+        prop.prune(pruneZeros=True)
+        self.assertDictEqual(prop, {})
+
+    def test_prune_zeros_in_list(self):
+        prop = Dict()
+        prop.a.b = [0]
+        prop.prune(pruneZeros=True)
+        self.assertDictEqual(prop, {})
+
+    def test_no_prune_lists(self):
+        prop = Dict()
+        prop.a.b = []
+        prop.prune(pruneLists=False)
+        self.assertDictEqual(prop, {'a': {'b': []}})
+
     def test_list_reduce(self):
         prop = Dict()
         prop.a = [Dict(), 1, 2]
