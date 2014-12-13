@@ -41,7 +41,10 @@ class Dict(dict):
         setattr is called when the syntax a.b = 2 is used to set a value.
 
         """
-        self.__setitem__(name, value)
+        if hasattr(Dict, name):
+            raise AttributeError("'Dict' object attribute '%s' is read-only" % name)
+        else:
+            self[name] = value
 
     def __setitem__(self, name, value):
         """

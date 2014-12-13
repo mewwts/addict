@@ -168,3 +168,16 @@ class Tests(unittest.TestCase):
         prop = Dict()
         prop.a.b.c = TEST_VAL
         self.assertEqual(prop._repr_html_(), TEST_DICT_STR)
+
+    def test_set_prop_invalid(self):
+        prop = Dict()
+
+        def set_keys():
+            prop.keys = 2
+
+        def set_items():
+            prop.items = 3
+
+        self.assertRaises(AttributeError, set_keys)
+        self.assertRaises(AttributeError, set_items)
+        self.assertDictEqual(prop, {})
