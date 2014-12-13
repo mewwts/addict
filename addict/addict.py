@@ -32,9 +32,17 @@ class Dict(dict):
         subdicts into Dicts as well.
 
         """
-        if args and isinstance(args[0], dict):
-            for key, val in args[0].items():
-                self[key] = val
+        for arg in args:
+            if not arg:
+               pass
+            elif isinstance(arg, dict):
+                for key, val in arg.items():
+                    self[key] = val
+            else:
+                self[arg[0]] = arg[1]
+
+        for key, val in kwargs.items():
+            self[key] = val
 
     def __setattr__(self, name, value):
         """

@@ -40,8 +40,34 @@ class Tests(unittest.TestCase):
         prop.a.b.c = TEST_VAL
         self.assertDictEqual(prop, TEST_DICT)
 
-    def test_instantiation(self):
+    def test_init_with_dict(self):
         self.assertDictEqual(TEST_DICT, Dict(TEST_DICT))
+
+    def test_init_with_kws(self):
+        prop = Dict(a=2, b={'a': 2}, c=[{'a':2}])
+        self.assertDictEqual(prop, {'a': 2, 'b': {'a': 2}, 'c': [{'a': 2}]})
+
+    def test_init_with_tuples(self):
+        prop = Dict((0,1), (1,2), (2, 3))
+        self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
+
+    def test_init_with_tuples_and_empty_list(self):
+        prop = Dict((0,1), [] , (2, 3))
+        self.assertDictEqual(prop, {0: 1, 2: 3})
+
+    def test_init_raises(self):
+        def init():
+            Dict(5)
+        def init2():
+            Dict('a')
+        self.assertRaises(TypeError, init)
+        self.assertRaises(IndexError, init2)
+
+    def test_init_with_empty_stuff(self):
+        a = Dict({})
+        b = Dict([])
+        self.assertDictEqual(a, {})
+        self.assertDictEqual(b, {})
 
     def test_getitem(self):
         prop = Dict(TEST_DICT)
@@ -181,3 +207,4 @@ class Tests(unittest.TestCase):
         self.assertRaises(AttributeError, set_keys)
         self.assertRaises(AttributeError, set_items)
         self.assertDictEqual(prop, {})
+
