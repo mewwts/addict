@@ -46,7 +46,7 @@ class Dict(dict):
 
         """
         if isinstance(getattr(super(Dict, self), name, None), BuiltinMethodType):
-            raise AttributeError("'Dict' object attribute %s is read-only" % name)
+            raise AttributeError("'Dict' object attribute '%s' is read-only" % name)
         self.__setitem__(name, value)
 
     def __setitem__(self, name, value):
