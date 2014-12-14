@@ -98,7 +98,7 @@ class Dict(dict):
 
         """
         for key, val in list(self.items()):
-            if (not val) and ((val != 0) or (prune_zero)) and not isinstance(val, list):
+            if (not val) and ((val != 0) or prune_zero) and not isinstance(val, list):
                 self.__delitem__(key)
             elif isinstance(val, Dict):
                 val._prune(prune_zero, prune_empty_list)
@@ -106,7 +106,7 @@ class Dict(dict):
                     self.__delitem__(key)
             elif isinstance(val, list):
                 new_list = self._prune_list(val, prune_zero, prune_empty_list)
-                if (len(new_list) == 0) and (prune_empty_list):
+                if (not new_list) and prune_empty_list:
                     self.__delitem__(key)
                 else:
                     self[key] = new_list

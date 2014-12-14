@@ -226,4 +226,4 @@ class Tests(unittest.TestCase):
     def test_do_not_prune_empty_list_nested(self):
         prop = Dict({'a': 1, 'c': {'d': []}})
         prop.prune(prune_empty_list=False)
-        self.assertDictEqual(prop, {'a': 1})
+        self.assertDictEqual(prop, {'a': 1, 'c': {'d': []}})
