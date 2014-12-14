@@ -98,50 +98,52 @@ class Dict(dict):
         return dir(Dict)
 
     def _ipython_display_(self):
-        print(str(self))
+        print(str(self))    # pragma: no cover
 
     def _repr_html_(self):
         return str(self)
 
-    def _prune(self):
+    def _prune(self, prune_zero=False, prune_empty_list=True):
         """
         Recursively remove falsy items from the Dict.
 
         """
         for key, val in list(self.items()):
-            if (not val) and (val != 0):
+            if (not val) and ((val != 0) or prune_zero) and not isinstance(val, list):
                 self.__delitem__(key)
             elif isinstance(val, Dict):
-                val._prune()
+                val._prune(prune_zero, prune_empty_list)
                 if not val:
                     self.__delitem__(key)
             elif isinstance(val, list):
-                new_list = self._prune_list(val)
-                self[key] = new_list
+                new_list = self._prune_list(val, prune_zero, prune_empty_list)
+                if (not new_list) and prune_empty_list:
+                    self.__delitem__(key)
+                else:
+                    self[key] = new_list
 
     @classmethod
-    def _prune_list(cls, some_list):
-        return [x for x in some_list if cls._list_reduce(x)]
+    def _prune_list(cls, some_list, prune_zero=False, prune_empty_list=True):
+        return [x for x in some_list if cls._list_reduce(x, prune_zero, prune_empty_list)]
 
     @classmethod
-    def _list_reduce(cls, item):
+    def _list_reduce(cls, item, prune_zero=False, prune_empty_list=True):
         if not item:
             return False
         elif isinstance(item, Dict):
-            item.prune()
+            item.prune(prune_zero, prune_empty_list)
             if not item:
                 return False
         elif isinstance(item, list):
-            new_item = cls._prune_list(item)
-            if not new_item:
+            new_item = cls._prune_list(item, prune_zero, prune_empty_list)
+            if not new_item and prune_empty_list:
                 return False
         return True
 
 
-    def prune(self):
+    def prune(self, prune_zero=False, prune_empty_list=True):
         """
         Removes all empty Dicts and falsy stuff inside the Dict.
-        0 vals are allowed for now.
         E.g
         >>> a = Dict()
         >>> a.b.c.d
@@ -152,5 +154,24 @@ class Dict(dict):
         >>> a.prune()
         >>> a
         {'a': 2}
+
+        Set prune_zero=True to remove 0 values
+        E.g
+        >>> a = Dict()
+        >>> a.b.c.d = 0
+        >>> a.prune(prune_zero=True)
+        >>> a
+        {}
+
+        Set prune_empty_list=False to have them persist
+        E.g
+        >>> a = Dict({'a': []})
+        >>> a.prune()
+        >>> a
+        {}
+        >>> a = Dict({'a': []})
+        >>> a.prune(prune_empty_list=False)
+        >>> a
+        {'a': []}
         """
-        self._prune()
+        self._prune(prune_zero, prune_empty_list)
