@@ -50,7 +50,8 @@ class Dict(dict):
 
         """
         if hasattr(Dict, name):
-            raise AttributeError("'Dict' object attribute '%s' is read-only" % name)
+            raise AttributeError("'Dict' object attribute"
+                                 " '{0}' is read-only".format(name))
         else:
             self[name] = value
 
@@ -76,7 +77,7 @@ class Dict(dict):
 
         """
         if name not in self:
-            self.__setitem__(name, {})
+            self[name] = {}
         return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
@@ -84,7 +85,7 @@ class Dict(dict):
         Is invoked when del some_instance_of_Dict.b is called.
 
         """
-        self.__delitem__(name)
+        del self[name]
 
     def __dir__(self):
         """
@@ -109,22 +110,24 @@ class Dict(dict):
 
         """
         for key, val in list(self.items()):
-            if (not val) and ((val != 0) or prune_zero) and not isinstance(val, list):
-                self.__delitem__(key)
+            if ((not val) and ((val != 0) or prune_zero) and
+                    not isinstance(val, list)):
+                del self[key]
             elif isinstance(val, Dict):
                 val._prune(prune_zero, prune_empty_list)
                 if not val:
-                    self.__delitem__(key)
+                    del self[key]
             elif isinstance(val, list):
                 new_list = self._prune_list(val, prune_zero, prune_empty_list)
                 if (not new_list) and prune_empty_list:
-                    self.__delitem__(key)
+                    del self[key]
                 else:
                     self[key] = new_list
 
     @classmethod
     def _prune_list(cls, some_list, prune_zero=False, prune_empty_list=True):
-        return [x for x in some_list if cls._list_reduce(x, prune_zero, prune_empty_list)]
+        return [x for x in some_list if
+                cls._list_reduce(x, prune_zero, prune_empty_list)]
 
     @classmethod
     def _list_reduce(cls, item, prune_zero=False, prune_empty_list=True):
