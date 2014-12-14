@@ -1,3 +1,6 @@
+from inspect import isgenerator
+
+
 class Dict(dict):
     """
     Dict is a subclass of dict, which allows you to get AND SET(!!)
@@ -34,12 +37,18 @@ class Dict(dict):
         """
         for arg in args:
             if not arg:
-               pass
+                continue
             elif isinstance(arg, dict):
                 for key, val in arg.items():
                     self[key] = val
-            else:
+            elif isinstance(arg, list) or isgenerator(arg):
+                for key, val in arg:
+                    self[key] = val
+            elif isinstance(arg, tuple):
                 self[arg[0]] = arg[1]
+            else:
+                raise TypeError("Dict does not understand "
+                                "{0} types".format(type(arg)))
 
         for key, val in kwargs.items():
             self[key] = val
@@ -50,8 +59,8 @@ class Dict(dict):
 
         """
         if hasattr(Dict, name):
-            raise AttributeError("'Dict' object attribute"
-                                 " '{0}' is read-only".format(name))
+            raise AttributeError("'Dict' object attribute "
+                                 "'{0}' is read-only".format(name))
         else:
             self[name] = value
 

@@ -48,11 +48,19 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(prop, {'a': 2, 'b': {'a': 2}, 'c': [{'a': 2}]})
 
     def test_init_with_tuples(self):
-        prop = Dict((0,1), (1,2), (2, 3))
+        prop = Dict((0, 1), (1, 2), (2, 3))
+        self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
+
+    def test_init_with_list(self):
+        prop = Dict([(0, 1), (1, 2), (2, 3)])
+        self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
+
+    def test_init_with_generator(self):
+        prop = Dict(((i, i+1) for i in range(3)))
         self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
 
     def test_init_with_tuples_and_empty_list(self):
-        prop = Dict((0,1), [] , (2, 3))
+        prop = Dict((0, 1), [], (2, 3))
         self.assertDictEqual(prop, {0: 1, 2: 3})
 
     def test_init_raises(self):
@@ -61,7 +69,7 @@ class Tests(unittest.TestCase):
         def init2():
             Dict('a')
         self.assertRaises(TypeError, init)
-        self.assertRaises(IndexError, init2)
+        self.assertRaises(TypeError, init2)
 
     def test_init_with_empty_stuff(self):
         a = Dict({})
