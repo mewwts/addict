@@ -87,51 +87,67 @@ class Dict(dict):
         self.__delitem__(name)
 
     def _ipython_display_(self):
-        print(str(self))
+        print(str(self)) # pragma: no cover
 
     def _repr_html_(self):
         return str(self)
 
-    def _prune(self):
+    def _prune(self, pruneZeros, pruneLists):
         """
         Recursively remove falsy items from the Dict.
 
         """
         for key, val in list(self.items()):
-            if (not val) and (val != 0):
-                self.__delitem__(key)
+            if (not val):
+                if isinstance(val, dict) or (pruneLists and isinstance(val, list)) or (pruneZeros and isinstance(val, int)):
+                    self.__delitem__(key)
             elif isinstance(val, Dict):
-                val._prune()
+                val._prune(pruneZeros, pruneLists)
                 if not val:
                     self.__delitem__(key)
             elif isinstance(val, list):
-                new_list = self._prune_list(val)
-                self[key] = new_list
+                new_list = self._prune_list(val, pruneZeros, pruneLists)
+                if pruneLists and not new_list:
+                    self.__delitem__(key)
+                else:
+                    self[key] = new_list
 
     @classmethod
-    def _prune_list(cls, some_list):
-        return [x for x in some_list if cls._list_reduce(x)]
+    def _prune_list(cls, some_list, pruneZeros, pruneLists):
+        l = [cls._list_reduce(x, pruneZeros, pruneLists) for x in some_list]
+        l = [x for x in l if not x is None]
+        return l
 
     @classmethod
-    def _list_reduce(cls, item):
+    def _list_reduce(cls, item, pruneZeros, pruneLists):
         if not item:
-            return False
+            if isinstance(item, int):
+                return None if pruneZeros else item
+            elif isinstance(item, list):
+                return None if pruneLists else item
+            else:
+                return None
         elif isinstance(item, Dict):
             item.prune()
             if not item:
-                return False
+                return None
         elif isinstance(item, list):
-            new_item = cls._prune_list(item)
+            new_item = cls._prune_list(item, pruneZeros, pruneLists)
             if not new_item:
-                return False
-        return True
+                if pruneLists:
+                    return None
+                else:
+                    return new_item
+        return item
 
 
-    def prune(self):
+    def prune(self, pruneZeros=False, pruneLists=True):
         """
         Removes all empty Dicts and falsy stuff inside the Dict.
-        0 vals are allowed for now.
-        E.g
+        If the user specifies pruneZeros, then 0s are pruned from the Dict.
+        If the user specifies pruneLists, then empty lists are pruned from the Dict.
+
+        E.g Normal pruning
         >>> a = Dict()
         >>> a.b.c.d
         {}
@@ -141,5 +157,26 @@ class Dict(dict):
         >>> a.prune()
         >>> a
         {'a': 2}
+
+        E.g. Zero pruning
+        >>> a = Dict()
+        >>> a.a = []
+        >>> a.b = [0]
+        >>> a.c = 0
+        >>> a
+        {'a': [], 'b': [0], 'c': 0}
+        >>> a.prune(pruneZeros=True)
+        >>> a
+        {'a': [], 'b': []}
+
+        E.g. List pruning
+        >>> a = Dict()
+        >>> a.a = []
+        >>> a
+        {'a': []}
+        >>> a.prune(pruneLists=True)
+        >>> a
+        {}
+
         """
-        self._prune()
+        self._prune(pruneZeros, pruneLists)

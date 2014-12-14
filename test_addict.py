@@ -161,7 +161,7 @@ class Tests(unittest.TestCase):
     def test_prune_list(self):
         l = [Dict(), Dict(), Dict()]
         l[0].a.b = 2
-        l1 = Dict._prune_list(l)
+        l1 = Dict._prune_list(l, False, True)
         self.assertSequenceEqual(l1, [{'a': {'b': 2}}])
 
     def test_prune_not_new_list(self):
@@ -170,6 +170,30 @@ class Tests(unittest.TestCase):
         prop.b = 2
         prop.prune()
         self.assertDictEqual(prop, {'b': 2})
+
+    def test_prune_zeros(self):
+        prop = Dict()
+        prop.a.b = 0
+        prop.prune(pruneZeros=True)
+        self.assertDictEqual(prop, {})
+
+    def test_prune_zeros_in_list(self):
+        prop = Dict()
+        prop.a.b = [0]
+        prop.prune(pruneZeros=True)
+        self.assertDictEqual(prop, {})
+
+    def test_no_prune_lists(self):
+        prop = Dict()
+        prop.a.b = []
+        prop.prune(pruneLists=False)
+        self.assertDictEqual(prop, {'a': {'b': []}})
+
+    def test_no_prune_lists_prune_zeros(self):
+        prop = Dict()
+        prop.a = [[0]]
+        prop.prune(pruneLists=False, pruneZeros=True)
+        self.assertDictEqual(prop, {'a': [[]]})
 
     def test_list_reduce(self):
         prop = Dict()
@@ -208,3 +232,5 @@ class Tests(unittest.TestCase):
         self.assertRaises(AttributeError, set_items)
         self.assertDictEqual(prop, {})
 
+if __name__ == '__main__':
+    unittest.main()
