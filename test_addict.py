@@ -208,3 +208,22 @@ class Tests(unittest.TestCase):
         self.assertRaises(AttributeError, set_items)
         self.assertDictEqual(prop, {})
 
+    def test_prune_zero(self):
+        prop = Dict({'a': 1, 'c': 0})
+        prop.prune(prune_zero=True)
+        self.assertDictEqual(prop, {'a': 1})
+
+    def test_prune_zero_nested(self):
+        prop = Dict({'a': 1, 'c': {'d': 0}})
+        prop.prune(prune_zero=True)
+        self.assertDictEqual(prop, {'a': 1})
+
+    def test_prune_empty_list_nested(self):
+        prop = Dict({'a': 1, 'c': {'d': []}})
+        prop.prune()
+        self.assertDictEqual(prop, {'a': 1})
+
+    def test_do_not_prune_empty_list_nested(self):
+        prop = Dict({'a': 1, 'c': {'d': []}})
+        prop.prune(prune_empty_list=False)
+        self.assertDictEqual(prop, {'a': 1})
