@@ -208,6 +208,18 @@ class Tests(unittest.TestCase):
         self.assertRaises(AttributeError, set_items)
         self.assertDictEqual(prop, {})
 
+    def test_dir(self):
+        prop = Dict({'a': 1})
+        dir_prop = dir(prop)
+        self.assertEqual(dir_prop, dir(Dict))
+        self.assertTrue('__methods__' not in dir_prop)
+        self.assertTrue('__members__' not in dir_prop)
+
+    def test_dir_with_members(self):
+        prop = Dict({'__members__': 1})
+        dir(prop)
+        self.assertTrue('__members__' in prop.keys())
+
     def test_prune_zero(self):
         prop = Dict({'a': 1, 'c': 0})
         prop.prune(prune_zero=True)
