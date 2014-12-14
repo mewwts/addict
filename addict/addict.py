@@ -56,6 +56,13 @@ class Dict(dict):
 
     def __setitem__(self, name, value):
         """
+        Calling the dir() method on this using python 2.7 adds "__members__" and "__methods__"
+        to the dictionary
+        """
+        if name == "__members__" or name == "__methods__":
+            return
+
+        """
         This is called when trying to set a value of the Dict using [].
         E.g. some_instance_of_Dict['b'] = val. If 'val
 
