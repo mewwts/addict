@@ -86,6 +86,17 @@ class Dict(dict):
         """
         self.__delitem__(name)
 
+    def __dir__(self):
+        """
+        Is invoked on a Dict instance causes __getitem__() to get invoked
+        which in this module will trigger the creation of the following
+        properties: `__members__` and `__methods__`
+
+        To avoid these keys from being added, we simply return an explicit
+        call to dir for the Dict object
+        """
+        return dir(Dict)
+
     def _ipython_display_(self):
         print(str(self))
 
