@@ -22,7 +22,7 @@ class Dict(dict):
     my_Dict.a.b.d = [4, 5, 6]
 
     instead. But hey, you can always use the same syntax as a regular dict,
-    however, this will not raise TypeErrors or AtrributeErrors at any time
+    however, this will not raise TypeErrors or AttributeErrors at any time
     while you try to get an item. A lot like a defaultdict.
 
     """
