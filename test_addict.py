@@ -193,6 +193,7 @@ class Tests(unittest.TestCase):
         prop = Dict()
         prop.a = [[0]]
         prop.prune(pruneLists=False, pruneZeros=True)
+        self.assertDictEqual(prop, {'a': [[]]})
 
     def test_list_reduce(self):
         prop = Dict()
