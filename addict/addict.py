@@ -187,3 +187,24 @@ class Dict(dict):
         {'a': []}
         """
         self._prune(prune_zero, prune_empty_list)
+
+    def to_dict(self):
+        return self._as_dict(self)
+
+    @classmethod
+    def _as_dict(cls, inst):
+       base = dict()
+       for key, value in inst.items():
+           if isinstance(value, cls):
+               base[key] = cls._as_dict(value)
+           elif isinstance(value, list):
+               base[key] = []
+               for item in value:
+                   if isinstance(item, cls):
+                       base[key].append(cls._as_dict(item))
+                   else:
+                       base[key].append(item)
+           else:
+               base[key] = value
+       return base
+

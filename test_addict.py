@@ -247,3 +247,18 @@ class Tests(unittest.TestCase):
         prop = Dict({'a': 1, 'c': {'d': []}})
         prop.prune(prune_empty_list=False)
         self.assertDictEqual(prop, {'a': 1, 'c': {'d': []}})
+
+    def test_to_dict(self):
+        nested = {'a': [{'a': 0}, 2], 'b': {}, 'c': 2}
+        prop = Dict(nested)
+        regular = prop.to_dict()
+        self.assertDictEqual(regular, prop)
+        self.assertDictEqual(regular, nested)
+        self.assertIsInstance(regular, dict)
+        def get_attr():
+            regular.a = 2
+        self.assertRaises(AttributeError, get_attr)
+        def get_attr_deep():
+            regular['a'][0].a = 1
+        self.assertRaises(AttributeError, get_attr_deep)
+
