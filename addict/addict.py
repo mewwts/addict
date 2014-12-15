@@ -128,46 +128,6 @@ class Dict(dict):
     def _repr_html_(self):
         return str(self)
 
-    def _prune(self, prune_zero=False, prune_empty_list=True):
-        """
-        Recursively remove falsy items from the Dict.
-
-        """
-        for key, val in list(self.items()):
-            if ((not val) and ((val != 0) or prune_zero) and
-                    not isinstance(val, list)):
-                del self[key]
-            elif isinstance(val, Dict):
-                val._prune(prune_zero, prune_empty_list)
-                if not val:
-                    del self[key]
-            elif isinstance(val, list):
-                new_list = self._prune_list(val, prune_zero, prune_empty_list)
-                if (not new_list) and prune_empty_list:
-                    del self[key]
-                else:
-                    self[key] = new_list
-
-    @classmethod
-    def _prune_list(cls, some_list, prune_zero=False, prune_empty_list=True):
-        return [x for x in some_list if
-                cls._list_reduce(x, prune_zero, prune_empty_list)]
-
-    @classmethod
-    def _list_reduce(cls, item, prune_zero=False, prune_empty_list=True):
-        if not item:
-            return False
-        elif isinstance(item, Dict):
-            item.prune(prune_zero, prune_empty_list)
-            if not item:
-                return False
-        elif isinstance(item, list):
-            new_item = cls._prune_list(item, prune_zero, prune_empty_list)
-            if not new_item and prune_empty_list:
-                return False
-        return True
-
-
     def prune(self, prune_zero=False, prune_empty_list=True):
         """
         Removes all empty Dicts and falsy stuff inside the Dict.
@@ -201,7 +161,39 @@ class Dict(dict):
         >>> a
         {'a': []}
         """
-        self._prune(prune_zero, prune_empty_list)
+        for key, val in list(self.items()):
+            if ((not val) and ((val != 0) or prune_zero) and
+                    not isinstance(val, list)):
+                del self[key]
+            elif isinstance(val, Dict):
+                val.prune(prune_zero, prune_empty_list)
+                if not val:
+                    del self[key]
+            elif isinstance(val, list):
+                new_list = self._prune_list(val, prune_zero, prune_empty_list)
+                if (not new_list) and prune_empty_list:
+                    del self[key]
+                else:
+                    self[key] = new_list
+
+    @classmethod
+    def _prune_list(cls, some_list, prune_zero=False, prune_empty_list=True):
+        return [x for x in some_list if
+                cls._list_reduce(x, prune_zero, prune_empty_list)]
+
+    @classmethod
+    def _list_reduce(cls, item, prune_zero=False, prune_empty_list=True):
+        if not item:
+            return False
+        elif isinstance(item, Dict):
+            item.prune(prune_zero, prune_empty_list)
+            if not item:
+                return False
+        elif isinstance(item, list):
+            new_item = cls._prune_list(item, prune_zero, prune_empty_list)
+            if not new_item and prune_empty_list:
+                return False
+        return True
 
     def to_dict(self):
         return self._as_dict(self)
