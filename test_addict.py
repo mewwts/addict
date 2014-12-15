@@ -77,6 +77,11 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(a, {})
         self.assertDictEqual(b, {})
 
+    def test_init_with_list_of_dicts(self):
+        a = Dict({'a': [{'b': 2}]})
+        self.assertIsInstance(a.a[0], Dict)
+        self.assertEqual(a.a[0].b, 2)
+
     def test_getitem(self):
         prop = Dict(TEST_DICT)
         self.assertEqual(prop['a']['b']['c'], TEST_VAL)
