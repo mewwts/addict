@@ -83,12 +83,29 @@ Traceback (most recent call last):
 AttributeError: 'Dict' object attribute 'keys' is read-only
 ```
 
+###Recursive Fallback to dict
+The defaultdict-like behaviour of addict, means it is prone to accidental setting of attributes. If you don't feel safe shipping your addict around to other modules, use the to_dict()-method, which returns a regular dict clone of the addict Dict.
+
+```Python
+>>> regular_dict = my_addict.to_dict()
+>>> regular_dict.a = 2
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'dict' object has no attribute 'a'
+```
+This is perfect for when you wish to create a nested Dict in a few lines, and then ship it on to a different module. 
+```Python
+body = Dict()
+body.query.filtered.query.match.description = 'addictive'
+body.query.filtered.filter.term.created_by = 'Mats'
+third_party_module.search(query=body.to_dict())
+```
 ###When is this **especially** useful? 
 
 This module rose from the entirely tiresome creation of elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
 
 ###Perks
-As it is essentially a ```dict```, it will also serialize into JSON perfectly. Ready for use with hopefully all other libraries that handles dicts.
+As it is a ```dict```, it will serialize into JSON perfectly, and with the to_dict()-method you can feel safe shipping your addict anywhere.
 
 ###Testimonials
 @spiritsack - *"Mother of God, this changes everything."*
