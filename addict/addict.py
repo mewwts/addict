@@ -42,6 +42,7 @@ class Dict(dict):
                 for key, val in arg.items():
                     self[key] = val
             elif isinstance(arg, list) or isgenerator(arg):
+                print(arg)
                 for key, val in arg:
                     self[key] = val
             elif isinstance(arg, tuple):
@@ -70,9 +71,24 @@ class Dict(dict):
         E.g. some_instance_of_Dict['b'] = val. If 'val
 
         """
-        if isinstance(value, dict):
-            value = self.__class__(value)
+        value = self._hook(value)
         super(Dict, self).__setitem__(name, value)
+
+    @classmethod
+    def _hook(cls, item):
+        """
+        Called to ensure that each dict-instance that are being set
+        is a addict Dict. Recurses.
+
+        """
+        if isinstance(item, dict):
+            return cls(item)
+        elif isinstance(item, list):
+            new_list = []
+            for elem in item:
+                new_list.append(cls._hook(elem))
+            return new_list
+        return item
 
     def __getattr__(self, item):
         return self.__getitem__(item)
