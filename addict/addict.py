@@ -29,7 +29,7 @@ class Dict(dict):
     while you try to get an item. A lot like a defaultdict.
 
     """
-    def __init__(self, args):
+    def __init__(self, arg):
         """
         If we're initialized with a dict, make sure we turn all the
         subdicts into Dicts as well.
