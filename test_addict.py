@@ -171,10 +171,23 @@ class Tests(unittest.TestCase):
         prop.prune()
         self.assertDictEqual(prop, {'a': [{'b': {'c': 2}}]})
 
+    def test_prune_with_tuple(self):
+        prop = Dict()
+        prop.a = (Dict(), Dict(), Dict())
+        prop.a[0].b.c = 2
+        prop.prune()
+        self.assertDictEqual(prop, {'a': ({'b': {'c': 2}}, )})
+
     def test_prune_list(self):
         l = [Dict(), Dict(), Dict()]
         l[0].a.b = 2
-        l1 = Dict._prune_list(l)
+        l1 = Dict._prune_iter(l)
+        self.assertSequenceEqual(l1, [{'a': {'b': 2}}])
+
+    def test_prune_tuple(self):
+        l = (Dict(), Dict(), Dict())
+        l[0].a.b = 2
+        l1 = Dict._prune_iter(l)
         self.assertSequenceEqual(l1, [{'a': {'b': 2}}])
 
     def test_prune_not_new_list(self):
@@ -184,18 +197,31 @@ class Tests(unittest.TestCase):
         prop.prune()
         self.assertDictEqual(prop, {'b': 2})
 
-    def test_list_reduce(self):
+    def test_iter_reduce(self):
         prop = Dict()
         prop.a = [Dict(), 1, 2]
         prop.a[0].b.c
         prop.prune()
         self.assertDictEqual(prop, {'a': [1, 2]})
 
-    def test_list_reduce_nested_list(self):
+    def test_iter_reduce(self):
+        prop = Dict()
+        prop.a = (Dict(), 1, 2)
+        prop.a[0].b.c
+        prop.prune()
+        self.assertDictEqual(prop, {'a': (1, 2)})
+
+    def test_prune_nested_list(self):
         prop = Dict()
         prop.a = [Dict(), [[]], [1,2,3]]
         prop.prune()
         self.assertDictEqual(prop, {'a': [[1,2,3]]})
+
+    def test_complex_nested_structure(self):
+        prop = Dict()
+        prop.a = [(Dict(), 2), [[]], [1, (2, 3), 0]]
+        prop.prune(prune_zero=True)
+        self.assertDictEqual(prop, {'a': [(2,), [1, (2, 3)]]})
 
     def test_tuple_key(self):
         prop = Dict()
@@ -243,10 +269,20 @@ class Tests(unittest.TestCase):
         prop.prune(prune_zero=True)
         self.assertDictEqual(prop, {'a': 1})
 
+    def test_prune_zero_in_tuple(self):
+        prop = Dict({'a': 1, 'c': (1, 0)})
+        prop.prune(prune_zero=True)
+        self.assertDictEqual(prop, {'a': 1, 'c': (1, )})
+
     def test_prune_empty_list_nested(self):
         prop = Dict({'a': 1, 'c': {'d': []}})
         prop.prune()
         self.assertDictEqual(prop, {'a': 1})
+
+    def test_not_prune_empty_list_nested(self):
+        prop = Dict({'a': 1, 'c': ([], )})
+        prop.prune(prune_empty_list=False)
+        self.assertDictEqual(prop, {'a': 1, 'c': ([], )})
 
     def test_do_not_prune_empty_list_nested(self):
         prop = Dict({'a': 1, 'c': {'d': []}})
@@ -259,11 +295,20 @@ class Tests(unittest.TestCase):
         regular = prop.to_dict()
         self.assertDictEqual(regular, prop)
         self.assertDictEqual(regular, nested)
-        self.assertIsInstance(regular, dict)
+        self.assertNotIsInstance(regular, Dict)
         def get_attr():
             regular.a = 2
         self.assertRaises(AttributeError, get_attr)
         def get_attr_deep():
             regular['a'][0].a = 1
         self.assertRaises(AttributeError, get_attr_deep)
+
+    def test_to_dict_with_tuple(self):
+        nested = {'a': ({'a': 0}, {2: 0})}
+        prop = Dict(nested)
+        regular = prop.to_dict()
+        self.assertDictEqual(regular, prop)
+        self.assertDictEqual(regular, nested)
+        self.assertIsInstance(regular['a'], tuple)
+        self.assertNotIsInstance(regular['a'][0], Dict)
 
