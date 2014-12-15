@@ -25,7 +25,7 @@ class Dict(dict):
     my_Dict.a.b.d = [4, 5, 6]
 
     instead. But hey, you can always use the same syntax as a regular dict,
-    however, this will not raise TypeErrors or AtrributeErrors at any time
+    however, this will not raise TypeErrors or AttributeErrors at any time
     while you try to get an item. A lot like a defaultdict.
 
     """
@@ -82,11 +82,13 @@ class Dict(dict):
         """
         if isinstance(item, dict):
             return cls(item)
-        elif isinstance(item, list):
-            new_list = []
+        elif isinstance(item, (list, tuple)):
+            new_iter = []
             for elem in item:
-                new_list.append(cls._hook(elem))
-            return new_list
+                new_iter.append(cls._hook(elem))
+            if isinstance(item, tuple):
+                new_iter = tuple(new_iter)
+            return new_iter
         return item
 
     def __getattr__(self, item):
@@ -169,31 +171,34 @@ class Dict(dict):
                 val.prune(prune_zero, prune_empty_list)
                 if not val:
                     del self[key]
-            elif isinstance(val, list):
-                new_list = self._prune_list(val, prune_zero, prune_empty_list)
-                if (not new_list) and prune_empty_list:
+            elif isinstance(val, (list, tuple)):
+                new_iter = self._prune_iter(val, prune_zero, prune_empty_list)
+                if (not new_iter) and prune_empty_list:
                     del self[key]
                 else:
-                    self[key] = new_list
+                    if isinstance(val, tuple):
+                        new_iter = tuple(new_iter)
+                    self[key] = new_iter
 
     @classmethod
-    def _prune_list(cls, some_list, prune_zero=False, prune_empty_list=True):
-        return [x for x in some_list if
-                cls._list_reduce(x, prune_zero, prune_empty_list)]
-
-    @classmethod
-    def _list_reduce(cls, item, prune_zero=False, prune_empty_list=True):
-        if not item:
-            return False
-        elif isinstance(item, Dict):
-            item.prune(prune_zero, prune_empty_list)
-            if not item:
-                return False
-        elif isinstance(item, list):
-            new_item = cls._prune_list(item, prune_zero, prune_empty_list)
-            if not new_item and prune_empty_list:
-                return False
-        return True
+    def _prune_iter(cls, some_iter, prune_zero=False, prune_empty_list=True):
+        new_iter = []
+        for item in some_iter:
+            if item == 0 and prune_zero:
+                continue
+            elif isinstance(item, Dict):
+                item.prune(prune_zero, prune_empty_list)
+                if item:
+                    new_iter.append(item)
+            elif isinstance(item, (list, tuple)):
+                new_item = cls._prune_iter(item, prune_zero, prune_empty_list)
+                if new_item or not prune_empty_list:
+                    if isinstance(item, tuple):
+                        new_item = tuple(new_item)
+                    new_iter.append(new_item)
+            else:
+                new_iter.append(item)
+        return new_iter
 
     def to_dict(self):
        """
@@ -204,13 +209,15 @@ class Dict(dict):
        for key, value in self.items():
            if isinstance(value, self.__class__):
                base[key] = value.to_dict()
-           elif isinstance(value, list):
+           elif isinstance(value, (list, tuple)):
                base[key] = []
                for item in value:
                    if isinstance(item, self.__class__):
                        base[key].append(item.to_dict())
                    else:
                        base[key].append(item)
+               if isinstance(value, tuple):
+                   base[key] = tuple(base[key])
            else:
                base[key] = value
        return base
