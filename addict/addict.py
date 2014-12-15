@@ -42,7 +42,6 @@ class Dict(dict):
                 for key, val in arg.items():
                     self[key] = val
             elif isinstance(arg, list) or isgenerator(arg):
-                print(arg)
                 for key, val in arg:
                     self[key] = val
             elif isinstance(arg, tuple):
