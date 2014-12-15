@@ -247,3 +247,9 @@ class Tests(unittest.TestCase):
         prop = Dict({'a': 1, 'c': {'d': []}})
         prop.prune(prune_empty_list=False)
         self.assertDictEqual(prop, {'a': 1, 'c': {'d': []}})
+
+    def test_to_dict(self):
+        prop =  Dict()
+        prop.a.b.c = TEST_VAL
+        dict_prop = prop.to_dict()
+        self.assertDictEqual(dict_prop, TEST_DICT)

@@ -153,6 +153,30 @@ class Dict(dict):
         return True
 
 
+    def _to_dict(self, dictionary=None):
+        """
+        Recursively convert Dict to dict
+        """
+        to_dict = {}
+        iterItems = self.items()
+        if dictionary:
+            iterItems = dictionary.items()
+
+        for key,value in iterItems:
+            if isinstance(value, dict):
+                to_dict[key] = self._to_dict(value)
+            else:
+                to_dict[key] = value
+        return to_dict
+
+
+    def to_dict(self):
+        """
+        Converts Dict into dict
+        """
+        return self._to_dict(self)
+
+
     def prune(self, prune_zero=False, prune_empty_list=True):
         """
         Removes all empty Dicts and falsy stuff inside the Dict.
