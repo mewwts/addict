@@ -158,7 +158,7 @@ class Dict(dict):
         Recursively convert Dict to dict
         """
         to_dict = {}
-	iterItems = self.items()
+        iterItems = self.items()
         if dictionary:
             iterItems = dictionary.items()
 
