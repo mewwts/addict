@@ -196,19 +196,19 @@ class Dict(dict):
         return True
 
     def to_dict(self):
-        return self._as_dict(self)
+       """
+       Recursively turn your addict Dicts into dicts.
 
-    @classmethod
-    def _as_dict(cls, inst):
+       """
        base = dict()
-       for key, value in inst.items():
-           if isinstance(value, cls):
-               base[key] = cls._as_dict(value)
+       for key, value in self.items():
+           if isinstance(value, self.__class__):
+               base[key] = value.to_dict()
            elif isinstance(value, list):
                base[key] = []
                for item in value:
-                   if isinstance(item, cls):
-                       base[key].append(cls._as_dict(item))
+                   if isinstance(item, self.__class__):
+                       base[key].append(item.to_dict())
                    else:
                        base[key].append(item)
            else:
