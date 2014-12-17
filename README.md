@@ -58,6 +58,7 @@ But don't you worry, if you by mistake added some empty Dicts in your Dict, you 
 >>> addicted.prune()
 {'a': 2}
 ```
+
 ### Stuff to keep in mind
 Also, remember that ```int```s are not valid attribute names, so keys of the dict that are not strings must be set/get with the get-/setitem syntax
 ```Python
@@ -71,6 +72,7 @@ However feel free to mix the two syntaxes:
 >>> addicted.a.b['c'].d.e
 2
 ```
+
 ###Attributes like keys, items etc.
 addict will not let you override attributes that are native to ```dict```, so the following will not work
 ```Python
@@ -101,11 +103,21 @@ body.query.filtered.filter.term.created_by = 'Mats'
 third_party_module.search(query=body.to_dict())
 ```
 ###When is this **especially** useful? 
-
 This module rose from the entirely tiresome creation of elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
 
 ###Perks
 As it is a ```dict```, it will serialize into JSON perfectly, and with the to_dict()-method you can feel safe shipping your addict anywhere.
+
+###Testing, Development and CI
+Pull requests and commits will be automatically run against TravisCI and coveralls. 
+
+The unit tests are implemented in the `test_addict.py` file and use the unittest python framework. Running the tests is rather simple:
+```sh
+python -m unittest -v test_addict
+
+# - or -
+python test_addict.py
+```
 
 ###Testimonials
 @spiritsack - *"Mother of God, this changes everything."*
