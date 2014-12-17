@@ -83,12 +83,7 @@ class Dict(dict):
         if isinstance(item, dict):
             return cls(item)
         elif isinstance(item, (list, tuple)):
-            new_iter = []
-            for elem in item:
-                new_iter.append(cls._hook(elem))
-            if isinstance(item, tuple):
-                new_iter = tuple(new_iter)
-            return new_iter
+            return item.__class__([cls._hook(elem) for elem in item])
         return item
 
     def __getattr__(self, item):
@@ -210,14 +205,10 @@ class Dict(dict):
            if isinstance(value, self.__class__):
                base[key] = value.to_dict()
            elif isinstance(value, (list, tuple)):
-               base[key] = []
-               for item in value:
-                   if isinstance(item, self.__class__):
-                       base[key].append(item.to_dict())
-                   else:
-                       base[key].append(item)
-               if isinstance(value, tuple):
-                   base[key] = tuple(base[key])
+               base[key] = value.__class__(
+                [item.to_dict() 
+                    if isinstance(item, self.__class__) else item
+                for item in value])
            else:
                base[key] = value
        return base
