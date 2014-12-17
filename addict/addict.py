@@ -29,29 +29,13 @@ class Dict(dict):
     while you try to get an item. A lot like a defaultdict.
 
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, arg):
         """
         If we're initialized with a dict, make sure we turn all the
         subdicts into Dicts as well.
 
         """
-        for arg in args:
-            if not arg:
-                continue
-            elif isinstance(arg, dict):
-                for key, val in arg.items():
-                    self[key] = val
-            elif isinstance(arg, list) or isgenerator(arg):
-                for key, val in arg:
-                    self[key] = val
-            elif isinstance(arg, tuple):
-                self[arg[0]] = arg[1]
-            else:
-                raise TypeError("Dict does not understand "
-                                "{0} types".format(type(arg)))
-
-        for key, val in kwargs.items():
-            self[key] = val
+        super(Dict, self).__init__(arg)
 
     def __setattr__(self, name, value):
         """
