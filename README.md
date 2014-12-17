@@ -109,6 +109,8 @@ This module rose from the entirely tiresome creation of elasticsearch queries in
 As it is a ```dict```, it will serialize into JSON perfectly, and with the to_dict()-method you can feel safe shipping your addict anywhere.
 
 ###Testing, Development and CI
+Issues and Pull Requests are more than welcome here. Feel free to open an issue to spark a discussion around a feature or a bug, or simply reply to the
+existing ones. As for Pull Requests, keeping in touch with the surrounding code style will be appreciated, and as such, writing tests are crucial. 
 Pull requests and commits will be automatically run against TravisCI and coveralls. 
 
 The unit tests are implemented in the `test_addict.py` file and use the unittest python framework. Running the tests is rather simple:
