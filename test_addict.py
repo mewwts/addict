@@ -312,3 +312,11 @@ class Tests(unittest.TestCase):
         self.assertIsInstance(regular['a'], tuple)
         self.assertNotIsInstance(regular['a'][0], Dict)
 
+
+"""
+Allow for these test cases to be run from the command line
+via `python test_addict.py`
+"""
+if __name__ == '__main__':
+    all_tests = unittest.TestLoader().loadTestsFromTestCase(Tests)
+    unittest.TextTestRunner(verbosity=2).run(all_tests)
