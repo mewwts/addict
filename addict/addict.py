@@ -41,11 +41,11 @@ class Dict(dict):
             elif isinstance(arg, dict):
                 for key, val in arg.items():
                     self[key] = val
-            elif isinstance(arg, list) or isgenerator(arg):
+            elif isinstance(arg, tuple) and (not isinstance(arg[0], tuple)):
+                self[arg[0]] = arg[1]
+            elif isinstance(arg, (list, tuple)) or isgenerator(arg):
                 for key, val in arg:
                     self[key] = val
-            elif isinstance(arg, tuple):
-                self[arg[0]] = arg[1]
             else:
                 raise TypeError("Dict does not understand "
                                 "{0} types".format(type(arg)))
