@@ -84,6 +84,16 @@ Traceback (most recent call last):
     raise AttributeError("'Dict' object attribute '%s' is read-only" % name)
 AttributeError: 'Dict' object attribute 'keys' is read-only
 ```
+However, the following is fine
+```Python
+>>> a = Dict()
+>>> a['keys'] = 2
+>>> a
+{'keys': 2}
+>>> a['keys']
+2
+```
+and hence there are no restrictions (other than what a regular dict imposes) regarding what keys you can use.
 
 ###Recursive Fallback to dict
 The defaultdict-like behaviour of addict, means it is prone to accidental setting of attributes. If you don't feel safe shipping your addict around to other modules, use the to_dict()-method, which returns a regular dict clone of the addict Dict.
