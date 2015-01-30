@@ -1,5 +1,7 @@
 import json
 import unittest
+from collections import defaultdict
+
 from addict import Dict
 
 TEST_VAL = [1, 2, 3]
@@ -312,6 +314,16 @@ class Tests(unittest.TestCase):
         self.assertIsInstance(regular['a'], tuple)
         self.assertNotIsInstance(regular['a'][0], Dict)
 
+    def test_defaultdict(self):
+        d = Dict()
+        d.ddi = defaultdict(int)
+        self.assertIsInstance(d.ddi, defaultdict)
+        d.ddi['i']+=3
+        self.assertDictEqual(d, {'ddi':{'i':3}})
+        d.ddl = defaultdict(list)
+        self.assertIsInstance(d.ddl, defaultdict)
+        d.ddl['lst'].append(3)
+        self.assertDictEqual(d, {'ddi':{'i':3}, 'ddl':{'lst':[3]}})
 
 """
 Allow for these test cases to be run from the command line
