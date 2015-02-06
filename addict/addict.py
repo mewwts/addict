@@ -219,3 +219,15 @@ class Dict(dict):
            else:
                base[key] = value
        return base
+
+    def update(self, d):
+        """
+        Recursively merge d into self.
+
+        """
+        for k, v in d.iteritems():
+            if (k not in self) or (not isinstance(self[k], dict)) or (not isinstance(v, dict)):
+                setattr(self, k, v)
+            else:
+                getattr(self, k).update(v)
+        return d
