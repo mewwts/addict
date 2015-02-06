@@ -225,7 +225,7 @@ class Dict(dict):
         Recursively merge d into self.
 
         """
-        for k, v in d.iteritems():
+        for k, v in d.items():
             if (k not in self) or (not isinstance(self[k], dict)) or (not isinstance(v, dict)):
                 setattr(self, k, v)
             else:
