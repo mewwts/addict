@@ -312,6 +312,26 @@ class Tests(unittest.TestCase):
         self.assertIsInstance(regular['a'], tuple)
         self.assertNotIsInstance(regular['a'][0], Dict)
 
+    def test_update(self):
+        old = Dict()
+        old.child.a = 'old a'
+        old.child.b = 'old b'
+        old.foo = 'no dict'
+
+        new = Dict()
+        new.child.b = 'new b'
+        new.child.c = 'new c'
+        new.foo.now_my_papa_is_a_dict = True
+
+        old.update(new)
+
+        reference = {
+                'foo': {'now_my_papa_is_a_dict': True},
+                'child': {'a': 'old a', 'c': 'new c', 'b': 'new b'}
+                }
+
+        self.assertDictEqual(old, reference)
+
 
 """
 Allow for these test cases to be run from the command line
