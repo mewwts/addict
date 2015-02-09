@@ -332,6 +332,33 @@ class Tests(unittest.TestCase):
 
         self.assertDictEqual(old, reference)
 
+    def test_copy(self):
+        class MyMutableObject(object):
+            def __init__(self):
+                self.attribute = None
+
+        foo = MyMutableObject()
+        foo.attribute = True
+
+        a = Dict()
+        a.child.immutable = 42
+        a.child.mutable = foo
+
+        b = a.copy()
+
+        # immutable object should not change
+        b.child.immutable = 21
+        self.assertEqual(a.child.immutable, 42)
+
+        # mutable object should change
+        b.child.mutable.attribute = False
+        self.assertEqual(a.child.mutable.attribute, b.child.mutable.attribute)
+
+        # changing child of b should not affect a
+        b.child = "new stuff"
+        self.assertTrue(isinstance(a.child, Dict))
+
+
 
 """
 Allow for these test cases to be run from the command line

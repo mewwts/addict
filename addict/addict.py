@@ -211,6 +211,15 @@ class Dict(dict):
                base[key] = value
        return base
 
+    def copy(self):
+        """
+        Return a disconnected deep copy of self. Children of type Dict, list
+        and tuple are copied recursively while values that are instances of
+        other mutable objects are not copied.
+
+        """
+        return Dict(self.to_dict())
+
     def update(self, d):
         """
         Recursively merge d into self.
