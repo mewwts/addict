@@ -1,4 +1,5 @@
 from inspect import isgenerator
+from collections import defaultdict
 
 
 class Dict(dict):
@@ -80,7 +81,9 @@ class Dict(dict):
         is a addict Dict. Recurses.
 
         """
-        if isinstance(item, dict):
+        if isinstance(item, defaultdict):
+            return item
+        elif isinstance(item, dict):
             return cls(item)
         elif isinstance(item, (list, tuple)):
             return type(item)(cls._hook(elem) for elem in item)
@@ -205,7 +208,7 @@ class Dict(dict):
                base[key] = value.to_dict()
            elif isinstance(value, (list, tuple)):
                base[key] = type(value)(
-                item.to_dict() if isinstance(item, type(self)) else 
+                item.to_dict() if isinstance(item, type(self)) else
                 item for item in value)
            else:
                base[key] = value
