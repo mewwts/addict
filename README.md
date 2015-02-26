@@ -72,6 +72,7 @@ However feel free to mix the two syntaxes:
 >>> addicted.a.b['c'].d.e
 2
 ```
+In order to allow you to use this syntax the data you put into an addict instance will be cloned. I.e. if you put a list into an addict Dict instance, addict will recursively clone the elements of the list, turning all dicts into addict Dicts. The same goes for tuples. This behaviour means that for some use cases, addict is less suitable, but please let us know in the issues if there is something you feel we have overlooked.
 
 ###Attributes like keys, items etc.
 addict will not let you override attributes that are native to ```dict```, so the following will not work
@@ -119,9 +120,7 @@ This module rose from the entirely tiresome creation of elasticsearch queries in
 As it is a ```dict```, it will serialize into JSON perfectly, and with the to_dict()-method you can feel safe shipping your addict anywhere.
 
 ###Testing, Development and CI
-Issues and Pull Requests are more than welcome here. Feel free to open an issue to spark a discussion around a feature or a bug, or simply reply to the
-existing ones. As for Pull Requests, keeping in touch with the surrounding code style will be appreciated, and as such, writing tests are crucial. 
-Pull requests and commits will be automatically run against TravisCI and coveralls. 
+Issues and Pull Requests are more than welcome. Feel free to open an issue to spark a discussion around a feature or a bug, or simply reply to the existing ones. As for Pull Requests, keeping in touch with the surrounding code style will be appreciated, and as such, writing tests are crucial. Pull requests and commits will be automatically run against TravisCI and coveralls. 
 
 The unit tests are implemented in the `test_addict.py` file and use the unittest python framework. Running the tests is rather simple:
 ```sh
@@ -133,3 +132,5 @@ python test_addict.py
 
 ###Testimonials
 @spiritsack - *"Mother of God, this changes everything."*
+
+@some guy on Hacker News - *"...the purpose itself is grossly unpythonic"*
