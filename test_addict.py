@@ -312,6 +312,53 @@ class Tests(unittest.TestCase):
         self.assertIsInstance(regular['a'], tuple)
         self.assertNotIsInstance(regular['a'][0], Dict)
 
+    def test_update(self):
+        old = Dict()
+        old.child.a = 'old a'
+        old.child.b = 'old b'
+        old.foo = 'no dict'
+
+        new = Dict()
+        new.child.b = 'new b'
+        new.child.c = 'new c'
+        new.foo.now_my_papa_is_a_dict = True
+
+        old.update(new)
+
+        reference = {
+                'foo': {'now_my_papa_is_a_dict': True},
+                'child': {'a': 'old a', 'c': 'new c', 'b': 'new b'}
+                }
+
+        self.assertDictEqual(old, reference)
+
+    def test_copy(self):
+        class MyMutableObject(object):
+            def __init__(self):
+                self.attribute = None
+
+        foo = MyMutableObject()
+        foo.attribute = True
+
+        a = Dict()
+        a.child.immutable = 42
+        a.child.mutable = foo
+
+        b = a.copy()
+
+        # immutable object should not change
+        b.child.immutable = 21
+        self.assertEqual(a.child.immutable, 42)
+
+        # mutable object should change
+        b.child.mutable.attribute = False
+        self.assertEqual(a.child.mutable.attribute, b.child.mutable.attribute)
+
+        # changing child of b should not affect a
+        b.child = "new stuff"
+        self.assertTrue(isinstance(a.child, Dict))
+
+
 
 """
 Allow for these test cases to be run from the command line
