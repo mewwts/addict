@@ -1,5 +1,5 @@
 from inspect import isgenerator
-
+import re
 
 class Dict(dict):
     """
@@ -108,16 +108,27 @@ class Dict(dict):
         """
         del self[name]
 
+    # Regular expression pattern for valid Python attributes
+    # https://docs.python.org/3/reference/lexical_analysis.html#identifiers
+    _re_pattern = re.compile('[a-zA-Z_][a-zA-Z0-9_]*')
+
     def __dir__(self):
         """
-        Is invoked on a Dict instance causes __getitem__() to get invoked
-        which in this module will trigger the creation of the following
-        properties: `__members__` and `__methods__`
-
-        To avoid these keys from being added, we simply return an explicit
-        call to dir for the Dict object
+        Return a list of addict object attributes.
+        This includes key names of any dict entries, filtered to the subset of
+        valid attribute names (e.g. alphanumeric strings beginning with a letter
+        or underscore).  Also includes attributes of parent dict class.
         """
-        return dir(Dict)
+        dict_keys = []
+        for k in self.keys():
+            if isinstance(k, str):
+                m = self._re_pattern.match(k)
+                if m:
+                    dict_keys.append(m.string)
+
+        obj_attrs = list(dir(Dict))
+
+        return dict_keys + obj_attrs
 
     def _ipython_display_(self):
         print(str(self))    # pragma: no cover
@@ -205,7 +216,7 @@ class Dict(dict):
                base[key] = value.to_dict()
            elif isinstance(value, (list, tuple)):
                base[key] = type(value)(
-                item.to_dict() if isinstance(item, type(self)) else 
+                item.to_dict() if isinstance(item, type(self)) else
                 item for item in value)
            else:
                base[key] = value
