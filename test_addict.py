@@ -248,9 +248,16 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(prop, {})
 
     def test_dir(self):
-        prop = Dict({'a': 1})
+        key = 'a'
+        prop = Dict({key: 1})
         dir_prop = dir(prop)
-        self.assertEqual(dir_prop, dir(Dict))
+
+        dir_dict = dir(Dict)
+        for d in dir_dict:
+            self.assertTrue(d in dir_prop, d)
+
+        self.assertTrue(key in dir_prop)
+
         self.assertTrue('__methods__' not in dir_prop)
         self.assertTrue('__members__' not in dir_prop)
 
