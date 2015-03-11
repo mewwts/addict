@@ -186,6 +186,7 @@ class Dict(dict):
 
     @classmethod
     def _prune_iter(cls, some_iter, prune_zero=False, prune_empty_list=True):
+
         new_iter = []
         for item in some_iter:
             if item == 0 and prune_zero:
@@ -208,7 +209,7 @@ class Dict(dict):
        Recursively turn your addict Dicts into dicts.
 
        """
-       base = dict()
+       base = {}
        for key, value in self.items():
            if isinstance(value, type(self)):
                base[key] = value.to_dict()
@@ -239,4 +240,3 @@ class Dict(dict):
                 self[k] = v
             else:
                 self[k].update(v)
-        return d
