@@ -108,8 +108,6 @@ class Dict(dict):
         """
         del self[name]
 
-    # Regular expression pattern for valid Python attributes
-    # https://docs.python.org/3/reference/lexical_analysis.html#identifiers
     _re_pattern = re.compile('[a-zA-Z_][a-zA-Z0-9_]*')
 
     def __dir__(self):
@@ -221,4 +219,3 @@ class Dict(dict):
            else:
                base[key] = value
        return base
-
