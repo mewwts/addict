@@ -236,7 +236,7 @@ class Dict(dict):
         """
         for k, v in d.items():
             if (k not in self) or (not isinstance(self[k], dict)) or (not isinstance(v, dict)):
-                setattr(self, k, v)
+                self[k] = v
             else:
-                getattr(self, k).update(v)
+                self[k].update(v)
         return d

@@ -332,12 +332,25 @@ class Tests(unittest.TestCase):
 
         old.update(new)
 
-        reference = {
-                'foo': {'now_my_papa_is_a_dict': True},
-                'child': {'a': 'old a', 'c': 'new c', 'b': 'new b'}
-                }
+        reference = {'foo': {'now_my_papa_is_a_dict': True},
+                     'child': {'a': 'old a', 'c': 'new c', 'b': 'new b'}}
 
         self.assertDictEqual(old, reference)
+
+    def test_update_with_lists(self):
+        org = Dict()
+        org.a = [1, 2, {'a': 'superman'}]
+        someother = Dict()
+        someother.b = [{'b': 123}]
+        org.update(someother)
+
+        correct = {'a': [1, 2, {'a': 'superman'}],
+                   'b': [{'b': 123}]}
+
+        org.update(someother)
+        self.assertDictEqual(org, correct)
+        self.assertIsInstance(org.b[0], Dict)
+
 
     def test_copy(self):
         class MyMutableObject(object):
