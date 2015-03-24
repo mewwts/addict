@@ -197,14 +197,14 @@ class Tests(unittest.TestCase):
         prop.prune()
         self.assertDictEqual(prop, {'b': 2})
 
-    def test_iter_reduce(self):
+    def test_iter_reduce_with_list(self):
         prop = Dict()
         prop.a = [Dict(), 1, 2]
         prop.a[0].b.c
         prop.prune()
         self.assertDictEqual(prop, {'a': [1, 2]})
 
-    def test_iter_reduce(self):
+    def test_iter_reduce_with_tuple(self):
         prop = Dict()
         prop.a = (Dict(), 1, 2)
         prop.a[0].b.c
