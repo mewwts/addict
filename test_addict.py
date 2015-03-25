@@ -6,6 +6,7 @@ TEST_VAL = [1, 2, 3]
 TEST_DICT = {'a': {'b': {'c': TEST_VAL}}}
 TEST_DICT_STR = str(TEST_DICT)
 
+
 class Tests(unittest.TestCase):
 
     def test_set_one_level_item(self):
@@ -44,7 +45,7 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(TEST_DICT, Dict(TEST_DICT))
 
     def test_init_with_kws(self):
-        prop = Dict(a=2, b={'a': 2}, c=[{'a':2}])
+        prop = Dict(a=2, b={'a': 2}, c=[{'a': 2}])
         self.assertDictEqual(prop, {'a': 2, 'b': {'a': 2}, 'c': [{'a': 2}]})
 
     def test_init_with_tuples(self):
@@ -56,7 +57,7 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
 
     def test_init_with_generator(self):
-        prop = Dict(((i, i+1) for i in range(3)))
+        prop = Dict(((i, i + 1) for i in range(3)))
         self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
 
     def test_init_with_tuples_and_empty_list(self):
@@ -66,6 +67,7 @@ class Tests(unittest.TestCase):
     def test_init_raises(self):
         def init():
             Dict(5)
+
         def init2():
             Dict('a')
         self.assertRaises(TypeError, init)
@@ -213,9 +215,9 @@ class Tests(unittest.TestCase):
 
     def test_prune_nested_list(self):
         prop = Dict()
-        prop.a = [Dict(), [[]], [1,2,3]]
+        prop.a = [Dict(), [[]], [1, 2, 3]]
         prop.prune()
-        self.assertDictEqual(prop, {'a': [[1,2,3]]})
+        self.assertDictEqual(prop, {'a': [[1, 2, 3]]})
 
     def test_complex_nested_structure(self):
         prop = Dict()
@@ -303,9 +305,11 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(regular, prop)
         self.assertDictEqual(regular, nested)
         self.assertNotIsInstance(regular, Dict)
+
         def get_attr():
             regular.a = 2
         self.assertRaises(AttributeError, get_attr)
+
         def get_attr_deep():
             regular['a'][0].a = 1
         self.assertRaises(AttributeError, get_attr_deep)
@@ -351,9 +355,9 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org.b[0], Dict)
 
-
     def test_copy(self):
         class MyMutableObject(object):
+
             def __init__(self):
                 self.attribute = None
 
@@ -377,7 +381,6 @@ class Tests(unittest.TestCase):
         # changing child of b should not affect a
         b.child = "new stuff"
         self.assertTrue(isinstance(a.child, Dict))
-
 
 
 """
