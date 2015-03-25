@@ -30,9 +30,11 @@ To install simply type
 ```sh
 pip install addict
 ```
+Addict runs on Python 2 and Python 3, and every build is tested towards 2.7, 3.3 and 3.4. 
+
 ###Usage
 addict inherits from ```dict```, but is way more flexible in terms of accessing and setting its values.
-Working with dictionaries have never been more awesome than this! Setting the items of a nested Dict is a *dream*:
+Working with dictionaries has never been easier than this! Setting the items of a nested Dict is a *dream*:
 
 ```Python
 >>> from addict import Dict
@@ -43,7 +45,7 @@ Working with dictionaries have never been more awesome than this! Setting the it
 ```
 
 ###Pruning
-It behaves much like a defaultdict, in the way that trying to get a nonexistent key will return a new, empty Dict instance.
+Addict behaves much like a defaultdict, in the way that trying to get a nonexistent key will return a new, empty Dict instance.
 So trying to peek at an empty item will result in
 ```Python
 >>> addicted = Dict()
@@ -53,7 +55,7 @@ So trying to peek at an empty item will result in
 >>> addicted
 {'a': 2, 'b': {'c': {'d': {'e': {}}}}}
 ```
-But don't you worry, if you by mistake added some empty Dicts in your Dict, you can recursively delete those by running .prune() on your Dict
+But don't you worry, if you by mistake added some empty Dicts in your Dict, you can recursively delete those by running `.prune()` on your Dict
 ```Python
 >>> addicted.prune()
 {'a': 2}
@@ -97,7 +99,7 @@ However, the following is fine
 and hence there are no restrictions (other than what a regular dict imposes) regarding what keys you can use.
 
 ###Recursive Fallback to dict
-The defaultdict-like behaviour of addict, means it is prone to accidental setting of attributes. If you don't feel safe shipping your addict around to other modules, use the to_dict()-method, which returns a regular dict clone of the addict Dict.
+The defaultdict-like behaviour of addict, means it is prone to accidental setting of attributes. If you don't feel safe shipping your addict around to other modules, use the to_dict()-method, which returns a regular dict clone of the addict dictionary.
 
 ```Python
 >>> regular_dict = my_addict.to_dict()
