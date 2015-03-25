@@ -98,7 +98,7 @@ class Dict(dict):
 
         """
         if name not in self:
-            self[name] = {}
+            self[name] = Dict()
         return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
