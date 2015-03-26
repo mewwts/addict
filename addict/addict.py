@@ -1,5 +1,6 @@
 from inspect import isgenerator
 import re
+import copy
 
 class Dict(dict):
     """
