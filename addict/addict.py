@@ -229,6 +229,17 @@ class Dict(dict):
 
         """
         return Dict(self.to_dict())
+        
+    def __deepcopy__(self, memo):
+        """
+        Return a disconnected deep copy of self. Called by copy.deepcopy.
+
+        """
+        y = self.__class__()
+        memo[id(self)] = y
+        for key, value in self.iteritems():
+            y[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
+        return y
 
     def update(self, d):
         """
