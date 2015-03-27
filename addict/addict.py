@@ -238,7 +238,7 @@ class Dict(dict):
         """
         y = self.__class__()
         memo[id(self)] = y
-        for key, value in self.iteritems():
+        for key, value in self.items():
             y[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
         return y
 
