@@ -106,10 +106,7 @@ class Dict(dict):
         return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
-        """
-        Is invoked when del some_instance_of_Dict.b is called.
-
-        """
+        """ Is invoked when del some_addict.b is called. """
         del self[name]
 
     _re_pattern = re.compile('[a-zA-Z_][a-zA-Z0-9_]*')
@@ -118,8 +115,8 @@ class Dict(dict):
         """
         Return a list of addict object attributes.
         This includes key names of any dict entries, filtered to the subset of
-        valid attribute names (e.g. alphanumeric strings beginning with a letter
-        or underscore).  Also includes attributes of parent dict class.
+        valid attribute names (e.g. alphanumeric strings beginning with a
+        letter or underscore).  Also includes attributes of parent dict class.
         """
         dict_keys = []
         for k in self.keys():
@@ -209,10 +206,7 @@ class Dict(dict):
         return new_iter
 
     def to_dict(self):
-        """
-        Recursively turn your addict Dicts into dicts.
-
-        """
+        """ Recursively turn your addict Dicts into dicts. """
         base = {}
         for key, value in self.items():
             if isinstance(value, type(self)):
@@ -233,12 +227,10 @@ class Dict(dict):
 
         """
         return Dict(self.to_dict())
-        
-    def __deepcopy__(self, memo):
-        """
-        Return a disconnected deep copy of self. Called by copy.deepcopy.
 
-        """
+    def __deepcopy__(self, memo):
+        """ Return a disconnected deep copy of self. """
+
         y = self.__class__()
         memo[id(self)] = y
         for key, value in self.items():
@@ -246,12 +238,12 @@ class Dict(dict):
         return y
 
     def update(self, d):
-        """
-        Recursively merge d into self.
+        """ Recursively merge d into self. """
 
-        """
         for k, v in d.items():
-            if (k not in self) or (not isinstance(self[k], dict)) or (not isinstance(v, dict)):
+            if ((k not in self) or
+                (not isinstance(self[k], dict)) or
+                (not isinstance(v, dict))):
                 self[k] = v
             else:
                 self[k].update(v)
