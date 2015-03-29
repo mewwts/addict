@@ -2,7 +2,9 @@ from inspect import isgenerator
 import re
 import copy
 
+
 class Dict(dict):
+
     """
     Dict is a subclass of dict, which allows you to get AND SET(!!)
     items in the dict using the attribute syntax!
@@ -30,6 +32,7 @@ class Dict(dict):
     while you try to get an item. A lot like a defaultdict.
 
     """
+
     def __init__(self, *args, **kwargs):
         """
         If we're initialized with a dict, make sure we turn all the
@@ -206,21 +209,21 @@ class Dict(dict):
         return new_iter
 
     def to_dict(self):
-       """
-       Recursively turn your addict Dicts into dicts.
+        """
+        Recursively turn your addict Dicts into dicts.
 
-       """
-       base = {}
-       for key, value in self.items():
-           if isinstance(value, type(self)):
-               base[key] = value.to_dict()
-           elif isinstance(value, (list, tuple)):
-               base[key] = type(value)(
-                item.to_dict() if isinstance(item, type(self)) else
-                item for item in value)
-           else:
-               base[key] = value
-       return base
+        """
+        base = {}
+        for key, value in self.items():
+            if isinstance(value, type(self)):
+                base[key] = value.to_dict()
+            elif isinstance(value, (list, tuple)):
+                base[key] = type(value)(
+                    item.to_dict() if isinstance(item, type(self)) else
+                    item for item in value)
+            else:
+                base[key] = value
+        return base
 
     def copy(self):
         """
