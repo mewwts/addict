@@ -1,4 +1,5 @@
 import json
+import copy
 import unittest
 from addict import Dict
 
@@ -197,14 +198,14 @@ class Tests(unittest.TestCase):
         prop.prune()
         self.assertDictEqual(prop, {'b': 2})
 
-    def test_iter_reduce(self):
+    def test_iter_reduce_with_list(self):
         prop = Dict()
         prop.a = [Dict(), 1, 2]
         prop.a[0].b.c
         prop.prune()
         self.assertDictEqual(prop, {'a': [1, 2]})
 
-    def test_iter_reduce(self):
+    def test_iter_reduce_with_tuple(self):
         prop = Dict()
         prop.a = (Dict(), 1, 2)
         prop.a[0].b.c
@@ -373,6 +374,32 @@ class Tests(unittest.TestCase):
         # mutable object should change
         b.child.mutable.attribute = False
         self.assertEqual(a.child.mutable.attribute, b.child.mutable.attribute)
+
+        # changing child of b should not affect a
+        b.child = "new stuff"
+        self.assertTrue(isinstance(a.child, Dict))
+
+    def test_deepcopy(self):
+        class MyMutableObject(object):
+            def __init__(self):
+                self.attribute = None
+
+        foo = MyMutableObject()
+        foo.attribute = True
+
+        a = Dict()
+        a.child.immutable = 42
+        a.child.mutable = foo
+
+        b = copy.deepcopy(a)
+
+        # immutable object should not change
+        b.child.immutable = 21
+        self.assertEqual(a.child.immutable, 42)
+
+        # mutable object should not change
+        b.child.mutable.attribute = False
+        self.assertTrue(a.child.mutable.attribute)
 
         # changing child of b should not affect a
         b.child = "new stuff"

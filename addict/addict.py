@@ -1,5 +1,6 @@
 from inspect import isgenerator
 import re
+import copy
 
 class Dict(dict):
     """
@@ -98,7 +99,7 @@ class Dict(dict):
 
         """
         if name not in self:
-            self[name] = {}
+            self[name] = Dict()
         return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
@@ -229,6 +230,17 @@ class Dict(dict):
 
         """
         return Dict(self.to_dict())
+        
+    def __deepcopy__(self, memo):
+        """
+        Return a disconnected deep copy of self. Called by copy.deepcopy.
+
+        """
+        y = self.__class__()
+        memo[id(self)] = y
+        for key, value in self.items():
+            y[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
+        return y
 
     def update(self, d):
         """
