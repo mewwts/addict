@@ -5,8 +5,8 @@ except ImportError:
 
 import addict
 
-description='Dict that can be set using attribute and item syntax.'
-long_description='Module that provides a much cleaner and less verbose way of setting out Python dictionaries. Values are gettable and settable using both attribute and item syntaxes. For more info check out the README at \'github.com/mewwts/addict\'.'
+SHORT='Addict is a dictionary whose items can be set using both attribute and item syntax.'
+LONG='Addict is a module that exposes a Dictionary subclass that allows items to be set like attributes. Values are gettable and settable using both attribute and item syntax. For more info check out the README at \'github.com/mewwts/addict\'.'
 
 setup(
     name='addict',
@@ -27,7 +27,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Development Status :: 3'
     ),
-    description=description,
-    long_description=long_description,
+    description=SHORT,
+    long_description=LONG,
     test_suite='test_addict'
 )
