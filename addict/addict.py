@@ -1,10 +1,10 @@
 from inspect import isgenerator
 import re
 import copy
+from collections import OrderedDict
 
 
-class Dict(dict):
-
+class Dict(OrderedDict):
     """
     Dict is a subclass of dict, which allows you to get AND SET(!!)
     items in the dict using the attribute syntax!
@@ -128,6 +128,10 @@ class Dict(dict):
         obj_attrs = list(dir(Dict))
 
         return dict_keys + obj_attrs
+
+    def __str__(self):
+        return '{{{}}}'.format(', '.join(
+            ["'{}': {}".format(key, value) for key, value in self.items()]))
 
     def _ipython_display_(self):
         print(str(self))    # pragma: no cover
