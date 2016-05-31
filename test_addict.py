@@ -413,13 +413,13 @@ class BaseTests(unittest.TestCase):
 class DictTests(BaseTests):
     def __init__(self, *args, **kwargs):
         self.DictClass = Dict
-        super(BaseTests, self).__init__(*args, **kwargs)
+        super(DictTests, self).__init__(*args, **kwargs)
 
 
 class OrderedDictTests(BaseTests):
     def __init__(self, *args, **kwargs):
         self.DictClass = OrderedDict
-        super(BaseTests, self).__init__(*args, **kwargs)
+        super(OrderedDictTests, self).__init__(*args, **kwargs)
 
 
 """
