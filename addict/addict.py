@@ -247,3 +247,9 @@ class Dict(dict):
                 self[k] = v
             else:
                 self[k].update(v)
+
+    def __getstate__(self):
+        return self
+
+    def __setstate__(self, state):
+        self.update(state)

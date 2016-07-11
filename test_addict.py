@@ -1,6 +1,7 @@
 import json
 import copy
 import unittest
+import pickle
 from addict import Dict
 
 TEST_VAL = [1, 2, 3]
@@ -408,6 +409,10 @@ class Tests(unittest.TestCase):
         # changing child of b should not affect a
         b.child = "new stuff"
         self.assertTrue(isinstance(a.child, Dict))
+
+    def test_pickle(self):
+        a = Dict(TEST_DICT)
+        assert a == pickle.loads(pickle.dumps(a))
 
 
 """
