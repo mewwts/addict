@@ -412,7 +412,7 @@ class Tests(unittest.TestCase):
 
     def test_pickle(self):
         a = Dict(TEST_DICT)
-        assert a == pickle.loads(pickle.dumps(a))
+        self.assertEqual(a, pickle.loads(pickle.dumps(a)))
 
 
 """
