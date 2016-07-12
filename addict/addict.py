@@ -248,6 +248,9 @@ class Dict(dict):
             else:
                 self[k].update(v)
 
+    def __getnewargs__(self):
+        return tuple(self.items())
+
     def __getstate__(self):
         return self
 
