@@ -25,7 +25,6 @@ setup(
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Development Status :: 3'
     ),
     description=SHORT,
     long_description=LONG,
