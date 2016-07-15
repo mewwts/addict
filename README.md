@@ -1,7 +1,7 @@
 # addict - the Python Dict that's better than heroin.
 [![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict)
 
-_addict is currently not actively developed, although maintained so it should be quite stable to use in your applications. If you are interested in contributing or help maintaining addict, or have any concerns on stability, please reach out through an issue._
+_addict is currently not being actively developed. However, it is being maintained so it should be quite stable to use in your applications. If you are interested in contributing or help maintaining addict, or have any concerns on stability, please reach out through an issue._
 
 ---
 
