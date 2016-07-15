@@ -355,7 +355,11 @@ class Tests(unittest.TestCase):
 
         org.update(someother)
         self.assertDictEqual(org, correct)
-        self.assertIsInstance(org.b[0], Dict)
+        self.assertIsInstance(org.b[0], dict)
+
+    def test_hook_in_constructor(self):
+        a_dict = Dict(TEST_DICT)
+        self.assertIsInstance(a_dict['a'], Dict)
 
     def test_copy(self):
         class MyMutableObject(object):
