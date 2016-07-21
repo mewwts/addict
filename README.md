@@ -1,9 +1,6 @@
 # addict - the Python Dict that's better than heroin.
-[![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict) [![PyPI version](https://badge.fury.io/py/addict.svg)](https://badge.fury.io/py/addict)
+[![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict) [![PyPI version](https://badge.fury.io/py/addict.svg)](https://badge.fury.io/py/addict) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/addict/badges/version.svg)](https://anaconda.org/conda-forge/addict)
 
-_addict is currently not being actively developed. However, it is being maintained so it should be quite stable to use in your applications. If you are interested in contributing or help maintaining addict, or have any concerns on stability, please reach out through an issue._
-
----
 
 addict is a Python module that gives you a dictionary whose values are both gettable and settable using both attribute and getitem syntax.
 
@@ -36,6 +33,12 @@ To install simply type
 ```sh
 pip install addict
 ```
+
+or
+```sh
+conda install addict -c conda-forge
+```
+
 Addict runs on Python 2 and Python 3, and every build is tested towards 2.7, 3.3, 3.4 and 3.5. 
 
 ###Usage
