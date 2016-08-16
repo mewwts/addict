@@ -360,7 +360,7 @@ class Tests(unittest.TestCase):
     def test_update_with_kws(self):
         org = Dict(one=1, two=2)
         someother = Dict(one=3)
-        someother.update(one=1, two=3)
+        someother.update(one=1, two=2)
         self.assertDictEqual(org, someother)
 
     def test_hook_in_constructor(self):
