@@ -357,6 +357,12 @@ class Tests(unittest.TestCase):
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org.b[0], dict)
 
+    def test_update_with_kws(self):
+        org = Dict(one=1, two=2)
+        someother = Dict(one=3)
+        someother.update(one=1, two=3)
+        self.assertDictEqual(org, someother)
+
     def test_hook_in_constructor(self):
         a_dict = Dict(TEST_DICT)
         self.assertIsInstance(a_dict['a'], Dict)
