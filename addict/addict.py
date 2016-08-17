@@ -237,11 +237,13 @@ class Dict(dict):
         return y
 
     def update(self, *args, **kwargs):
-        """ Recursively merge d into self. """
-        if len(args) > 0:
-            assert len(args) == 1
-            kwargs = args[0]
-        for k, v in kwargs.items():
+        other = {} 
+        if args:
+            if len(args) > 1:
+                raise TypeError()
+            other.update(args[0])
+        other.update(kwargs)
+        for k, v in other.items():
             if ((k not in self) or
                 (not isinstance(self[k], dict)) or
                 (not isinstance(v, dict))):
