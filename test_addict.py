@@ -327,19 +327,19 @@ class Tests(unittest.TestCase):
 
     def test_update(self):
         old = Dict()
-        old.child.a = 'old a'
-        old.child.b = 'old b'
-        old.foo = 'no dict'
+        old.child.a = 'a'
+        old.child.b = 'b'
+        old.foo = 'c'
 
         new = Dict()
-        new.child.b = 'new b'
-        new.child.c = 'new c'
-        new.foo.now_my_papa_is_a_dict = True
+        new.child.b = 'b2'
+        new.child.c = 'c'
+        new.foo.bar = True
 
         old.update(new)
 
-        reference = {'foo': {'now_my_papa_is_a_dict': True},
-                     'child': {'a': 'old a', 'c': 'new c', 'b': 'new b'}}
+        reference = {'foo': {'bar': True},
+                     'child': {'a': 'a', 'c': 'c', 'b': 'b2'}}
 
         self.assertDictEqual(old, reference)
 
@@ -356,6 +356,24 @@ class Tests(unittest.TestCase):
         org.update(someother)
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org.b[0], dict)
+
+    def test_update_with_kws(self):
+        org = Dict(one=1, two=2)
+        someother = Dict(one=3)
+        someother.update(one=1, two=2)
+        self.assertDictEqual(org, someother)
+
+    def test_update_with_args_and_kwargs(self):
+        expected = {'a': 1, 'b': 2}
+        org = Dict()
+        org.update({'a': 3, 'b': 2}, a=1)
+        self.assertDictEqual(org, expected)
+
+    def test_update_with_multiple_args(self):
+        org = Dict()
+        def update():
+            org.update({'a': 2}, {'a': 1})
+        self.assertRaises(TypeError, update)
 
     def test_hook_in_constructor(self):
         a_dict = Dict(TEST_DICT)

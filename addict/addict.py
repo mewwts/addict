@@ -236,10 +236,14 @@ class Dict(dict):
             y[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
         return y
 
-    def update(self, d):
-        """ Recursively merge d into self. """
-
-        for k, v in d.items():
+    def update(self, *args, **kwargs):
+        other = {} 
+        if args:
+            if len(args) > 1:
+                raise TypeError()
+            other.update(args[0])
+        other.update(kwargs)
+        for k, v in other.items():
             if ((k not in self) or
                 (not isinstance(self[k], dict)) or
                 (not isinstance(v, dict))):
