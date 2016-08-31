@@ -227,6 +227,14 @@ class Tests(unittest.TestCase):
         prop.prune(prune_zero=True)
         self.assertDictEqual(prop, {'a': [(2,), [1, (2, 3)]]})
 
+    def test_set_prop_in_array(self):
+        prop = Dict()
+        prop.a = [1, 2, 3]
+        prop.a[0] = {}
+        prop.a[0].b = "b"
+        self.assertDictEqual(prop, {'a':[{'b':'b'}, 2, 3]})
+
+
     def test_tuple_key(self):
         prop = Dict()
         prop[(1, 2)] = 2
