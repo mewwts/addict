@@ -83,6 +83,8 @@ class Dict(dict):
         is a addict Dict. Recurses.
 
         """
+        if isinstance(item, Dict):
+            return item
         if isinstance(item, dict):
             return cls(item)
         elif isinstance(item, (list, tuple)):
@@ -102,6 +104,8 @@ class Dict(dict):
         """
         if name not in self:
             self[name] = Dict()
+        else:
+            self[name] = self._hook(super(Dict, self).__getitem__(name))
         return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
