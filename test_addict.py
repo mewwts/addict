@@ -436,6 +436,33 @@ class Tests(unittest.TestCase):
         a = Dict(TEST_DICT)
         self.assertEqual(a, pickle.loads(pickle.dumps(a)))
 
+    def test_add_on_empty_dict(self):
+        d = Dict()
+        d.x.y += 1
+
+        self.assertEqual(d.x.y, 1)
+
+    def test_add_on_non_empty_dict(self):
+        d = Dict()
+        d.x.y = 'defined'
+
+        with self.assertRaises(TypeError):
+            d.x += 1
+
+    def test_add_on_non_empty_value(self):
+        d = Dict()
+        d.x.y = 1
+        d.x.y += 1
+
+        self.assertEqual(d.x.y, 2)
+
+    def test_add_on_unsupported_type(self):
+        d = Dict()
+        d.x.y = 'str'
+
+        with self.assertRaises(TypeError):
+            d.x.y += 1
+
 
 """
 Allow for these test cases to be run from the command line
