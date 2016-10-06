@@ -77,7 +77,7 @@ class Dict(dict):
         super(Dict, self).__setitem__(name, value)
 
     def __add__(self, other):
-        if len(self.keys()) == 0:
+        if not self.keys():
             return other
         else:
             self_type = type(self).__name__
