@@ -76,6 +76,15 @@ class Dict(dict):
         """
         super(Dict, self).__setitem__(name, value)
 
+    def __add__(self, other):
+        if not self.keys():
+            return other
+        else:
+            self_type = type(self).__name__
+            other_type = type(other).__name__
+            msg = "unsupported operand type(s) for +: '{}' and '{}'"
+            raise TypeError(msg.format(self_type, other_type))
+
     @classmethod
     def _hook(cls, item):
         """
