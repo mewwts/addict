@@ -2,14 +2,6 @@ import re
 import copy
 
 
-def isiterable(x):
-    try:
-        iter(x)
-        return True
-    except TypeError:
-        return False
-
-
 class Dict(dict):
 
     """
@@ -54,12 +46,13 @@ class Dict(dict):
                     self[key] = self._hook(val)
             elif isinstance(arg, tuple) and (not isinstance(arg[0], tuple)):
                 self[arg[0]] = self._hook(arg[1])
-            elif isiterable(arg):
-                for key, val in arg:
-                    self[key] = self._hook(val)
             else:
-                raise TypeError("Dict does not understand "
-                                "{0} types".format(type(arg)))
+                try:
+                    for key, val in iter(arg):
+                        self[key] = self._hook(val)
+                except TypeError:
+                    raise TypeError("Dict does not understand "
+                                    "{0} types".format(type(arg)))
 
         for key, val in kwargs.items():
             self[key] = val
