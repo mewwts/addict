@@ -1,6 +1,13 @@
-from inspect import isgenerator
 import re
 import copy
+
+
+def isiterable(x):
+    try:
+        iter(x)
+        return True
+    except TypeError:
+        return False
 
 
 class Dict(dict):
@@ -47,7 +54,7 @@ class Dict(dict):
                     self[key] = self._hook(val)
             elif isinstance(arg, tuple) and (not isinstance(arg[0], tuple)):
                 self[arg[0]] = self._hook(arg[1])
-            elif isinstance(arg, (list, tuple)) or isgenerator(arg):
+            elif isiterable(arg):
                 for key, val in arg:
                     self[key] = self._hook(val)
             else:
@@ -246,7 +253,7 @@ class Dict(dict):
         return y
 
     def update(self, *args, **kwargs):
-        other = {} 
+        other = {}
         if args:
             if len(args) > 1:
                 raise TypeError()

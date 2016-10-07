@@ -73,7 +73,7 @@ class Tests(unittest.TestCase):
         def init2():
             Dict('a')
         self.assertRaises(TypeError, init)
-        self.assertRaises(TypeError, init2)
+        self.assertRaises(ValueError, init2)
 
     def test_init_with_empty_stuff(self):
         a = Dict({})
@@ -462,6 +462,13 @@ class Tests(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             d.x.y += 1
+
+    def test_init_from_zip(self):
+        keys = ['a']
+        values = [42]
+        items = zip(keys, values)
+        d = Dict(items)
+        self.assertEqual(d.a, 42)
 
 
 """
