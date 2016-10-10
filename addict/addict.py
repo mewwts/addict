@@ -1,4 +1,3 @@
-from inspect import isgenerator
 import re
 import copy
 
@@ -47,12 +46,13 @@ class Dict(dict):
                     self[key] = self._hook(val)
             elif isinstance(arg, tuple) and (not isinstance(arg[0], tuple)):
                 self[arg[0]] = self._hook(arg[1])
-            elif isinstance(arg, (list, tuple)) or isgenerator(arg):
-                for key, val in arg:
-                    self[key] = self._hook(val)
             else:
-                raise TypeError("Dict does not understand "
-                                "{0} types".format(type(arg)))
+                try:
+                    for key, val in iter(arg):
+                        self[key] = self._hook(val)
+                except TypeError:
+                    raise TypeError("Dict does not understand "
+                                    "{0} types".format(type(arg)))
 
         for key, val in kwargs.items():
             self[key] = val
@@ -246,7 +246,7 @@ class Dict(dict):
         return y
 
     def update(self, *args, **kwargs):
-        other = {} 
+        other = {}
         if args:
             if len(args) > 1:
                 raise TypeError()
