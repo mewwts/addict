@@ -47,12 +47,8 @@ class Dict(dict):
             elif isinstance(arg, tuple) and (not isinstance(arg[0], tuple)):
                 self[arg[0]] = self._hook(arg[1])
             else:
-                try:
-                    for key, val in iter(arg):
-                        self[key] = self._hook(val)
-                except TypeError:
-                    raise TypeError("Dict does not understand "
-                                    "{0} types".format(type(arg)))
+                for key, val in iter(arg):
+                    self[key] = self._hook(val)
 
         for key, val in kwargs.items():
             self[key] = val
