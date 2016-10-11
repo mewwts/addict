@@ -124,6 +124,48 @@ body.query.filtered.query.match.description = 'addictive'
 body.query.filtered.filter.term.created_by = 'Mats'
 third_party_module.search(query=body.to_dict())
 ```
+
+###Counting
+`Dict`'s ability to easily access and modify deeply-nested attributes makes it ideal for counting. This offers a distinct advantage over `collections.Counter`, as it will easily allow for counting by multiple levels.
+
+Consider this data:
+
+```python
+data = [
+    {'born': 1980, 'gender': 'M', 'eyes': 'green'},
+    {'born': 1980, 'gender': 'F', 'eyes': 'green'},
+    {'born': 1980, 'gender': 'M', 'eyes': 'blue'},
+    {'born': 1980, 'gender': 'M', 'eyes': 'green'},
+    {'born': 1980, 'gender': 'M', 'eyes': 'green'},
+    {'born': 1980, 'gender': 'F', 'eyes': 'blue'},
+    {'born': 1981, 'gender': 'M', 'eyes': 'blue'},
+    {'born': 1981, 'gender': 'F', 'eyes': 'green'},
+    {'born': 1981, 'gender': 'M', 'eyes': 'blue'},
+    {'born': 1981, 'gender': 'F', 'eyes': 'blue'},
+    {'born': 1981, 'gender': 'M', 'eyes': 'green'},
+    {'born': 1981, 'gender': 'F', 'eyes': 'blue'}
+]
+```
+
+If you want to count how many people were born in `born` of gender `gender` with `eyes` eyes, you can easily calculate this information:
+
+```python
+counter = Dict()
+
+for row in data:
+    born = row['born']
+    gender = row['gender']
+    eyes = row['eyes']
+
+    counter[born][gender][eyes] += 1
+
+print counter
+```
+
+```
+{1980: {'M': {'blue': 1, 'green': 3}, 'F': {'blue': 1, 'green': 1}}, 1981: {'M': {'blue': 2, 'green': 1}, 'F': {'blue': 2, 'green': 1}}}
+```
+
 ###When is this **especially** useful? 
 This module rose from the entirely tiresome creation of elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
 
