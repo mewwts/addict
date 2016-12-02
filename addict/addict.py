@@ -2,7 +2,7 @@ import re
 import copy
 
 
-class Dict(dict, object):
+class Dict(dict):
 
     """
     Dict is a subclass of dict, which allows you to get AND SET(!!)
