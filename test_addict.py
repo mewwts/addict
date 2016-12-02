@@ -90,6 +90,11 @@ class Tests(unittest.TestCase):
         prop = Dict(TEST_DICT)
         self.assertEqual(prop['a']['b']['c'], TEST_VAL)
 
+    def test_empty_getitem(self):
+        prop = Dict()
+        prop.a.b.c
+        self.assertEqual(prop, {})
+
     def test_getattr(self):
         prop = Dict(TEST_DICT)
         self.assertEqual(prop.a.b.c, TEST_VAL)

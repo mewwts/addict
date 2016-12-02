@@ -2,7 +2,7 @@ import re
 import copy
 
 
-class Dict(dict):
+class Dict(dict, object):
 
     """
     Dict is a subclass of dict, which allows you to get AND SET(!!)
@@ -38,6 +38,8 @@ class Dict(dict):
         subdicts into Dicts as well.
 
         """
+        object.__setattr__(self, '__parent', kwargs.pop('__parent', None))
+        object.__setattr__(self, '__key', kwargs.pop('__key', None))
         for arg in args:
             if not arg:
                 continue
@@ -71,6 +73,14 @@ class Dict(dict):
 
         """
         super(Dict, self).__setitem__(name, value)
+        try:
+            p = object.__getattribute__(self, '__parent')
+            key = object.__getattribute__(self, '__key')
+        except AttributeError:
+            p = None
+            key = None
+        if p is not None and key:
+            p.__setattr__(key, self)
 
     def __add__(self, other):
         if not self.keys():
@@ -106,7 +116,7 @@ class Dict(dict):
 
         """
         if name not in self:
-            self[name] = Dict()
+            return Dict(__parent=self, __key=name)
         return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
