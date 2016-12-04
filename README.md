@@ -2,11 +2,9 @@
 [![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict) [![PyPI version](https://badge.fury.io/py/addict.svg)](https://badge.fury.io/py/addict) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/addict/badges/version.svg)](https://anaconda.org/conda-forge/addict)
 
 
-addict is a Python module that gives you a dictionary whose values are both gettable and settable using both attribute and getitem syntax.
+addict is a Python module that gives you dictionaries whose values are both gettable and settable using attributes, in addition to standard item-syntax.
 
-
-
-**Never again will you have to write code like this**:
+This means that you **don't have to** write dictionaries like this anymore:
 ```Python
 body = {
     'query': {
@@ -21,7 +19,7 @@ body = {
     }
 }
 ```
-From now on, you may simply write the following three lines:
+Instead, you can simply write the following three lines:
 ```Python
 body = Dict()
 body.query.filtered.query.match.description = 'addictive'
@@ -29,49 +27,54 @@ body.query.filtered.filter.term.created_by = 'Mats'
 ```
 
 ###Installing
-To install simply type
+You can install via `pip`
 ```sh
 pip install addict
 ```
 
-or
+or through `conda`
 ```sh
 conda install addict -c conda-forge
 ```
 
-Addict runs on Python 2 and Python 3, and every build is tested towards 2.7, 3.3, 3.4 and 3.5. 
+Addict runs on Python 2 and Python 3, and every build is tested towards 2.7, 3.5 and 3.6. 
 
 ###Usage
-addict inherits from ```dict```, but is way more flexible in terms of accessing and setting its values.
-Working with dictionaries has never been easier than this! Setting the items of a nested Dict is a *dream*:
+addict inherits from ```dict```, but is more flexible in terms of accessing and setting its values.
+Working with dictionaries are now a *joy*! Setting the items of a nested Dict is a *dream*:
 
 ```Python
 >>> from addict import Dict
->>> my_new_shiny_dict = Dict()
->>> my_new_shiny_dict.a.b.c.d.e = 2
->>> my_new_shiny_dict
+>>> mapping = Dict()
+>>> mapping.a.b.c.d.e = 2
+>>> mapping
 {'a': {'b': {'c': {'d': {'e': 2}}}}}
 ```
 
-###Pruning
-Addict behaves much like a defaultdict, in the way that trying to get a nonexistent key will return a new, empty Dict instance.
-So trying to peek at an empty item will result in
+If the `Dict` is instanciated with any iterable values, it will iterate through and clone these values, and turn `dict`s into `Dict`s.
+Hence, the following works
 ```Python
->>> addicted = Dict()
->>> addicted.a = 2
->>> addicted.b.c.d.e
-{}
->>> addicted
-{'a': 2, 'b': {'c': {'d': {'e': {}}}}}
+>>> mapping = {'a': [{'b': 3}, {'b': 3}]}
+>>> dictionary = Dict(mapping)
+>>> dictionary.a[0].b
+3
 ```
-But don't you worry, if you by mistake added some empty Dicts in your Dict, you can recursively delete those by running `.prune()` on your Dict
+but `mappping['a']` is no longer the same reference as `dictionary['a']`.
 ```Python
->>> addicted.prune()
-{'a': 2}
+>>> mapping['a'] is dictionary['a']
+False
+```
+This behavior is limited to the constructor, and not when items are set using attribute or item syntax, references are untouched:
+```Python
+>>> a = Dict()
+>>> b = [1, 2, 3]
+>>> a.b = b
+>>> a.b is b
+True
 ```
 
 ### Stuff to keep in mind
-Also, remember that ```int```s are not valid attribute names, so keys of the dict that are not strings must be set/get with the get-/setitem syntax
+Remember that ```int```s are not valid attribute names, so keys of the dict that are not strings must be set/get with the get-/setitem syntax
 ```Python
 >>> addicted = Dict()
 >>> addicted.a.b.c.d.e = 2
@@ -83,13 +86,12 @@ However feel free to mix the two syntaxes:
 >>> addicted.a.b['c'].d.e
 2
 ```
-In order to allow you to use this syntax the data you put into an addict instance will be cloned. I.e. if you put a list into an addict Dict instance, addict will recursively clone the elements of the list, turning all dicts into addict Dicts. The same goes for tuples. This behaviour means that for some use cases, addict is less suitable, but please let us know in the issues if there is something you feel we have overlooked.
 
 ###Attributes like keys, items etc.
 addict will not let you override attributes that are native to ```dict```, so the following will not work
 ```Python
->>> iama_addict = Dict()
->>> iama_addict.keys = 2
+>>> mapping = Dict()
+>>> mapping.keys = 2
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "addict/addict.py", line 53, in __setattr__
@@ -105,10 +107,10 @@ However, the following is fine
 >>> a['keys']
 2
 ```
-and hence there are no restrictions (other than what a regular dict imposes) regarding what keys you can use.
+just like a regular `dict`. There are no restrictions (other than what a regular dict imposes) regarding what keys you can use.
 
 ###Recursive Fallback to dict
-The defaultdict-like behaviour of addict, means it is prone to accidental setting of attributes. If you don't feel safe shipping your addict around to other modules, use the to_dict()-method, which returns a regular dict clone of the addict dictionary.
+If you don't feel safe shipping your addict around to other modules, use the `to_dict()`-method, which returns a regular dict clone of the addict dictionary.
 
 ```Python
 >>> regular_dict = my_addict.to_dict()
@@ -159,7 +161,7 @@ for row in data:
 
     counter[born][gender][eyes] += 1
 
-print counter
+print(counter)
 ```
 
 ```
@@ -167,7 +169,7 @@ print counter
 ```
 
 ###When is this **especially** useful? 
-This module rose from the entirely tiresome creation of elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
+This module rose from the entirely tiresome creation of Elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
 
 ###Perks
 As it is a ```dict```, it will serialize into JSON perfectly, and with the to_dict()-method you can feel safe shipping your addict anywhere.
