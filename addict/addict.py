@@ -1,43 +1,8 @@
-import re
 import copy
-
 
 class Dict(dict):
 
-    """
-    Dict is a subclass of dict, which allows you to get AND SET(!!)
-    items in the dict using the attribute syntax!
-
-    When you previously had to write:
-
-    my_dict = {'a': {'b': {'c': [1, 2, 3]}}}
-
-    you can now do the same simply by:
-
-    my_Dict = Dict()
-    my_Dict.a.b.c = [1, 2, 3]
-
-    Or for instance, if you'd like to add some additional stuff,
-    where you'd with the normal dict would write
-
-    my_dict['a']['b']['d'] = [4, 5, 6],
-
-    you may now do the AWESOME
-
-    my_Dict.a.b.d = [4, 5, 6]
-
-    instead. But hey, you can always use the same syntax as a regular dict,
-    however, this will not raise TypeErrors or AttributeErrors at any time
-    while you try to get an item. A lot like a defaultdict.
-
-    """
-
     def __init__(self, *args, **kwargs):
-        """
-        If we're initialized with a dict, make sure we turn all the
-        subdicts into Dicts as well.
-
-        """
         object.__setattr__(self, '__parent', kwargs.pop('__parent', None))
         object.__setattr__(self, '__key', kwargs.pop('__key', None))
         for arg in args:
@@ -56,10 +21,6 @@ class Dict(dict):
             self[key] = val
 
     def __setattr__(self, name, value):
-        """
-        setattr is called when the syntax a.b = 2 is used to set a value.
-
-        """
         if hasattr(Dict, name):
             raise AttributeError("'Dict' object attribute "
                                  "'{0}' is read-only".format(name))
@@ -67,11 +28,6 @@ class Dict(dict):
             self[name] = value
 
     def __setitem__(self, name, value):
-        """
-        This is called when trying to set a value of the Dict using [].
-        E.g. some_instance_of_Dict['b'] = val. If 'val
-
-        """
         super(Dict, self).__setitem__(name, value)
         try:
             p = object.__getattribute__(self, '__parent')
@@ -93,11 +49,6 @@ class Dict(dict):
 
     @classmethod
     def _hook(cls, item):
-        """
-        Called to ensure that each dict-instance that are being set
-        is a addict Dict. Recurses.
-
-        """
         if isinstance(item, dict):
             return cls(item)
         elif isinstance(item, (list, tuple)):
@@ -108,49 +59,17 @@ class Dict(dict):
         return self.__getitem__(item)
 
     def __getitem__(self, name):
-        """
-        This is called when the Dict is accessed by []. E.g.
-        some_instance_of_Dict['a'];
-        If the name is in the dict, we return it. Otherwise we set both
-        the attr and item to a new instance of Dict.
-
-        """
         if name not in self:
             return Dict(__parent=self, __key=name)
         return super(Dict, self).__getitem__(name)
 
     def __delattr__(self, name):
-        """ Is invoked when del some_addict.b is called. """
         del self[name]
-
-    _re_pattern = re.compile('[a-zA-Z_][a-zA-Z0-9_]*')
-
-    def __dir__(self):
-        """
-        Return a list of addict object attributes.
-        This includes key names of any dict entries, filtered to the subset of
-        valid attribute names (e.g. alphanumeric strings beginning with a
-        letter or underscore).  Also includes attributes of parent dict class.
-        """
-        dict_keys = []
-        for k in self.keys():
-            if isinstance(k, str):
-                m = self._re_pattern.match(k)
-                if m:
-                    dict_keys.append(m.string)
-
-        obj_attrs = list(dir(Dict))
-
-        return dict_keys + obj_attrs
-
-    def _ipython_display_(self):
-        print(str(self))    # pragma: no cover
 
     def _repr_html_(self):
         return str(self)
 
     def to_dict(self):
-        """ Recursively turn your addict Dicts into dicts. """
         base = {}
         for key, value in self.items():
             if isinstance(value, type(self)):
@@ -164,22 +83,14 @@ class Dict(dict):
         return base
 
     def copy(self):
-        """
-        Return a disconnected deep copy of self. Children of type Dict, list
-        and tuple are copied recursively while values that are instances of
-        other mutable objects are not copied.
-
-        """
-        return Dict(self.to_dict())
+        return Dict(self)
 
     def __deepcopy__(self, memo):
-        """ Return a disconnected deep copy of self. """
-
-        y = self.__class__()
-        memo[id(self)] = y
+        other = self.__class__()
+        memo[id(self)] = other
         for key, value in self.items():
-            y[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
-        return y
+            other[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
+        return other
 
     def update(self, *args, **kwargs):
         other = {}
@@ -204,3 +115,4 @@ class Dict(dict):
 
     def __setstate__(self, state):
         self.update(state)
+

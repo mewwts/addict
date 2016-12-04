@@ -172,8 +172,6 @@ class Tests(unittest.TestCase):
         for d in dir_dict:
             self.assertTrue(d in dir_prop, d)
 
-        self.assertTrue(key in dir_prop)
-
         self.assertTrue('__methods__' not in dir_prop)
         self.assertTrue('__members__' not in dir_prop)
 
