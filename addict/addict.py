@@ -66,9 +66,6 @@ class Dict(dict):
     def __delattr__(self, name):
         del self[name]
 
-    def _repr_html_(self):
-        return str(self)
-
     def to_dict(self):
         base = {}
         for key, value in self.items():

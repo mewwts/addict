@@ -6,7 +6,6 @@ from addict import Dict
 
 TEST_VAL = [1, 2, 3]
 TEST_DICT = {'a': {'b': {'c': TEST_VAL}}}
-TEST_DICT_STR = str(TEST_DICT)
 
 
 class Tests(unittest.TestCase):
@@ -144,11 +143,6 @@ class Tests(unittest.TestCase):
         prop[(1, 2)] = 2
         self.assertDictEqual(prop, {(1, 2): 2})
         self.assertEqual(prop[(1, 2)], 2)
-
-    def test_repr_html(self):
-        prop = Dict()
-        prop.a.b.c = TEST_VAL
-        self.assertEqual(prop._repr_html_(), TEST_DICT_STR)
 
     def test_set_prop_invalid(self):
         prop = Dict()
