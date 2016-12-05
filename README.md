@@ -37,7 +37,7 @@ or through `conda`
 conda install addict -c conda-forge
 ```
 
-Addict runs on Python 2 and Python 3, and every build is tested towards 2.7, 3.5 and 3.6. 
+Addict runs on Python 2 and Python 3, and every build is tested towards 2.7 and 3.5. 
 
 ###Usage
 addict inherits from ```dict```, but is more flexible in terms of accessing and setting its values.
