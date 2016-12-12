@@ -6,7 +6,9 @@ except ImportError:
 import addict
 
 SHORT='Addict is a dictionary whose items can be set using both attribute and item syntax.'
-LONG='Addict is a module that exposes a Dictionary subclass that allows items to be set like attributes. Values are gettable and settable using both attribute and item syntax. For more info check out the README at \'github.com/mewwts/addict\'.'
+LONG=('Addict is a module that exposes a Dictionary subclass that allows items to be set like attributes. '
+     'Values are gettable and settable using both attribute and item syntax. '
+     'For more info check out the README at \'github.com/mewwts/addict\'.')
 
 setup(
     name='addict',
