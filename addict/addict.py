@@ -80,7 +80,7 @@ class Dict(dict):
         return base
 
     def copy(self):
-        return Dict(self)
+        return copy.copy(self)
 
     def __deepcopy__(self, memo):
         other = self.__class__()
