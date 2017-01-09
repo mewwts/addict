@@ -270,7 +270,7 @@ class Tests(unittest.TestCase):
 
         # immutable object should not change
         b.child.immutable = 21
-        self.assertEqual(a.child.immutable, 42)
+        self.assertEqual(a.child.immutable, 21)
 
         # mutable object should change
         b.child.mutable.attribute = False
