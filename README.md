@@ -59,7 +59,7 @@ Hence, the following works
 >>> dictionary.a[0].b
 3
 ```
-but `mappping['a']` is no longer the same reference as `dictionary['a']`.
+but `mapping['a']` is no longer the same reference as `dictionary['a']`.
 ```Python
 >>> mapping['a'] is dictionary['a']
 False
