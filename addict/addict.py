@@ -113,3 +113,10 @@ class Dict(dict):
     def __setstate__(self, state):
         self.update(state)
 
+    def setdefault(self, key, default):
+        if key in self:
+            return self[key]
+        else:
+            self[key] = default
+            return default
+

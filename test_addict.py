@@ -344,6 +344,21 @@ class Tests(unittest.TestCase):
         d = Dict(items)
         self.assertEqual(d.a, 42)
 
+    def test_setdefault_simple(self):
+        d = Dict()
+        d.setdefault('a', 2)
+        self.assertEqual(d.a, 2)
+        d.setdefault('a', 3)
+        self.assertEqual(d.a, 2)
+        d.setdefault('c', []).append(2)
+        self.assertEqual(d.c, [2])
+
+    def test_setdefault_nested(self):
+        d = Dict()
+        d.one.setdefault('two', [])
+        self.assertEqual(d.one.two, [])
+        d.one.setdefault('three', []).append(3)
+        self.assertEqual(d.one.three, [3])
 
 """
 Allow for these test cases to be run from the command line
