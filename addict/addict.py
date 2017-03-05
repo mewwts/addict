@@ -35,7 +35,7 @@ class Dict(dict):
         except AttributeError:
             p = None
             key = None
-        if p is not None and key is not None:
+        if p is not None:
             p[key] = self
             object.__delattr__(self, '__parent')
             object.__delattr__(self, '__key')
