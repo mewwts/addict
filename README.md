@@ -167,6 +167,21 @@ print(counter)
 ```
 {1980: {'M': {'blue': 1, 'green': 3}, 'F': {'blue': 1, 'green': 1}}, 1981: {'M': {'blue': 2, 'green': 1}, 'F': {'blue': 2, 'green': 1}}}
 ```
+### Update
+`addict`s update functionality is altered for convenience from a normal `dict`. Where updating nested item using a `dict` would overwrite it:
+```Python
+>>> d = {'a': {'b': 3}}
+>>> d.update({'a': {'c': 4}})
+>>> print(d)
+{'a': {'c': 4}}
+```
+`addict` will recurse and _actually_ update the nested `Dict`. 
+```Python
+>>> D = Dict({'a': {'b': 3}})
+>>> D.update({'a': {'c': 4}})
+>>> print(D)
+{'a': {'b': 3, 'c': 4}}
+```
 
 ###When is this **especially** useful? 
 This module rose from the entirely tiresome creation of Elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
