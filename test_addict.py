@@ -344,6 +344,25 @@ class Tests(unittest.TestCase):
         d = Dict(items)
         self.assertEqual(d.a, 42)
 
+    def test_parent_key_item(self):
+        a = Dict()
+        try:
+            a['keys']['x'] = 1
+        except AttributeError as e:
+            self.fail(e)
+        try:
+            a[1].x = 3
+        except Exception as e:
+            self.fail(e)
+        self.assertEquals(a, {'keys': {'x': 1}, 1: {'x': 3}})
+    
+    def test_parent_key_prop(self):
+        a = Dict()
+        try:
+            a.y.x = 1
+        except AttributeError as e:
+            self.fail(e)
+        self.assertEquals(a, {'y': {'x': 1}})
 
 """
 Allow for these test cases to be run from the command line
