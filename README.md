@@ -26,7 +26,7 @@ body.query.filtered.query.match.description = 'addictive'
 body.query.filtered.filter.term.created_by = 'Mats'
 ```
 
-###Installing
+### Installing
 You can install via `pip`
 ```sh
 pip install addict
@@ -39,7 +39,7 @@ conda install addict -c conda-forge
 
 Addict runs on Python 2 and Python 3, and every build is tested towards 2.7 and 3.5. 
 
-###Usage
+### Usage
 addict inherits from ```dict```, but is more flexible in terms of accessing and setting its values.
 Working with dictionaries are now a *joy*! Setting the items of a nested Dict is a *dream*:
 
@@ -87,7 +87,7 @@ However feel free to mix the two syntaxes:
 2
 ```
 
-###Attributes like keys, items etc.
+### Attributes like keys, items etc.
 addict will not let you override attributes that are native to ```dict```, so the following will not work
 ```Python
 >>> mapping = Dict()
@@ -109,7 +109,7 @@ However, the following is fine
 ```
 just like a regular `dict`. There are no restrictions (other than what a regular dict imposes) regarding what keys you can use.
 
-###Recursive Fallback to dict
+### Recursive Fallback to dict
 If you don't feel safe shipping your addict around to other modules, use the `to_dict()`-method, which returns a regular dict clone of the addict dictionary.
 
 ```Python
@@ -127,7 +127,7 @@ body.query.filtered.filter.term.created_by = 'Mats'
 third_party_module.search(query=body.to_dict())
 ```
 
-###Counting
+### Counting
 `Dict`'s ability to easily access and modify deeply-nested attributes makes it ideal for counting. This offers a distinct advantage over `collections.Counter`, as it will easily allow for counting by multiple levels.
 
 Consider this data:
@@ -183,13 +183,13 @@ print(counter)
 {'a': {'b': 3, 'c': 4}}
 ```
 
-###When is this **especially** useful? 
+### When is this **especially** useful? 
 This module rose from the entirely tiresome creation of Elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
 
-###Perks
+### Perks
 As it is a ```dict```, it will serialize into JSON perfectly, and with the to_dict()-method you can feel safe shipping your addict anywhere.
 
-###Testing, Development and CI
+### Testing, Development and CI
 Issues and Pull Requests are more than welcome. Feel free to open an issue to spark a discussion around a feature or a bug, or simply reply to the existing ones. As for Pull Requests, keeping in touch with the surrounding code style will be appreciated, and as such, writing tests are crucial. Pull requests and commits will be automatically run against TravisCI and coveralls. 
 
 The unit tests are implemented in the `test_addict.py` file and use the unittest python framework. Running the tests is rather simple:
@@ -200,7 +200,7 @@ python -m unittest -v test_addict
 python test_addict.py
 ```
 
-###Testimonials
+### Testimonials
 @spiritsack - *"Mother of God, this changes everything."*
 
 @some guy on Hacker News - *"...the purpose itself is grossly unpythonic"*
