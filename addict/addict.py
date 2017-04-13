@@ -1,5 +1,6 @@
 import copy
 
+
 class Dict(dict):
 
     def __init__(self, *args, **kwargs):
@@ -18,7 +19,7 @@ class Dict(dict):
                     self[key] = self._hook(val)
 
         for key, val in kwargs.items():
-            self[key] = val
+            self[key] = self._hook(val)
 
     def __setattr__(self, name, value):
         if hasattr(Dict, name):
