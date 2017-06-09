@@ -85,6 +85,15 @@ class Tests(unittest.TestCase):
         self.assertIsInstance(a.a[0], Dict)
         self.assertEqual(a.a[0].b, 2)
 
+    def test_init_with_kwargs(self):
+        a = Dict(a='b', c=dict(d='e', f=dict(g='h')))
+
+        self.assertEqual(a.a, 'b')
+        self.assertIsInstance(a.c, Dict)
+
+        self.assertEqual(a.c.f.g, 'h')
+        self.assertIsInstance(a.c.f, Dict)
+
     def test_getitem(self):
         prop = Dict(TEST_DICT)
         self.assertEqual(prop['a']['b']['c'], TEST_VAL)
