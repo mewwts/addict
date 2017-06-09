@@ -13,7 +13,7 @@ setup(
     url='https://github.com/mewwts/addict',
     author=addict.__author__,
     author_email='mats@plysjbyen.net',
-    classifiers=(
+    classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
@@ -22,7 +22,7 @@ setup(
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
-    ),
+    ],
     description=SHORT,
     long_description=LONG,
     test_suite='test_addict'
