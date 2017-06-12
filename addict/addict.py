@@ -3,23 +3,23 @@ import copy
 
 class Dict(dict):
 
-    def __init__(self, *args, **kwargs):
-        object.__setattr__(self, '__parent', kwargs.pop('__parent', None))
-        object.__setattr__(self, '__key', kwargs.pop('__key', None))
+    def __init__(__self, *args, **kwargs):
+        object.__setattr__(__self, '__parent', kwargs.pop('__parent', None))
+        object.__setattr__(__self, '__key', kwargs.pop('__key', None))
         for arg in args:
             if not arg:
                 continue
             elif isinstance(arg, dict):
                 for key, val in arg.items():
-                    self[key] = self._hook(val)
+                    __self[key] = __self._hook(val)
             elif isinstance(arg, tuple) and (not isinstance(arg[0], tuple)):
-                self[arg[0]] = self._hook(arg[1])
+                __self[arg[0]] = __self._hook(arg[1])
             else:
                 for key, val in iter(arg):
-                    self[key] = self._hook(val)
+                    __self[key] = __self._hook(val)
 
         for key, val in kwargs.items():
-            self[key] = self._hook(val)
+            __self[key] = __self._hook(val)
 
     def __setattr__(self, name, value):
         if hasattr(Dict, name):
