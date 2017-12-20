@@ -1,7 +1,8 @@
-import json
 import copy
-import unittest
+import json
 import pickle
+import unittest
+
 from addict import Dict
 
 TEST_VAL = [1, 2, 3]
@@ -315,6 +316,32 @@ class Tests(unittest.TestCase):
         b.child = "new stuff"
         self.assertTrue(isinstance(a.child, Dict))
 
+    def test_deepcopy2(self):
+        class MyMutableObject(object):
+            def __init__(self):
+                self.attribute = None
+
+        foo = MyMutableObject()
+        foo.attribute = True
+
+        a = Dict()
+        a.child.immutable = 42
+        a.child.mutable = foo
+
+        b = a.deepcopy()
+
+        # immutable object should not change
+        b.child.immutable = 21
+        self.assertEqual(a.child.immutable, 42)
+
+        # mutable object should not change
+        b.child.mutable.attribute = False
+        self.assertTrue(a.child.mutable.attribute)
+
+        # changing child of b should not affect a
+        b.child = "new stuff"
+        self.assertTrue(isinstance(a.child, Dict))
+
     def test_pickle(self):
         a = Dict(TEST_DICT)
         self.assertEqual(a, pickle.loads(pickle.dumps(a)))
@@ -379,7 +406,7 @@ class Tests(unittest.TestCase):
             a[1].x = 3
         except Exception as e:
             self.fail(e)
-        self.assertEquals(a, {'keys': {'x': 1}, 1: {'x': 3}})
+        self.assertEqual(a, {'keys': {'x': 1}, 1: {'x': 3}})
     
     def test_parent_key_prop(self):
         a = Dict()
