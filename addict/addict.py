@@ -85,6 +85,9 @@ class Dict(dict):
     def copy(self):
         return copy.copy(self)
 
+    def deepcopy(self):
+        return copy.deepcopy(self)
+
     def __deepcopy__(self, memo):
         other = self.__class__()
         memo[id(self)] = other
@@ -101,8 +104,8 @@ class Dict(dict):
         other.update(kwargs)
         for k, v in other.items():
             if ((k not in self) or
-                (not isinstance(self[k], dict)) or
-                (not isinstance(v, dict))):
+                    (not isinstance(self[k], dict)) or
+                    (not isinstance(v, dict))):
                 self[k] = v
             else:
                 self[k].update(v)
@@ -122,4 +125,3 @@ class Dict(dict):
         else:
             self[key] = default
             return default
-
