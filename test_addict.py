@@ -1,8 +1,7 @@
-import copy
 import json
-import pickle
+import copy
 import unittest
-
+import pickle
 from addict import Dict
 
 TEST_VAL = [1, 2, 3]
@@ -406,7 +405,7 @@ class Tests(unittest.TestCase):
             a[1].x = 3
         except Exception as e:
             self.fail(e)
-        self.assertEqual(a, {'keys': {'x': 1}, 1: {'x': 3}})
+        self.assertEquals(a, {'keys': {'x': 1}, 1: {'x': 3}})
     
     def test_parent_key_prop(self):
         a = Dict()
