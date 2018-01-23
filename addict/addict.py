@@ -104,8 +104,8 @@ class Dict(dict):
         other.update(kwargs)
         for k, v in other.items():
             if ((k not in self) or
-                    (not isinstance(self[k], dict)) or
-                    (not isinstance(v, dict))):
+                (not isinstance(self[k], dict)) or
+                (not isinstance(v, dict))):
                 self[k] = v
             else:
                 self[k].update(v)
