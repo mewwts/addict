@@ -22,14 +22,14 @@ class Dict(dict):
             __self[key] = __self._hook(val)
 
     def __setattr__(self, name, value):
-        if hasattr(Dict, name):
+        if hasattr(self.__class__, name):
             raise AttributeError("'Dict' object attribute "
                                  "'{0}' is read-only".format(name))
         else:
             self[name] = value
 
     def __setitem__(self, name, value):
-        super(Dict, self).__setitem__(name, value)
+        super().__setitem__(name, value)
         try:
             p = object.__getattribute__(self, '__parent')
             key = object.__getattribute__(self, '__key')
@@ -61,10 +61,8 @@ class Dict(dict):
     def __getattr__(self, item):
         return self.__getitem__(item)
 
-    def __getitem__(self, name):
-        if name not in self:
-            return Dict(__parent=self, __key=name)
-        return super(Dict, self).__getitem__(name)
+    def __missing__(self, name):
+        return self.__class__(__parent=self, __key=name)
 
     def __delattr__(self, name):
         del self[name]
