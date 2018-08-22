@@ -29,7 +29,7 @@ class Dict(dict):
             self[name] = value
 
     def __setitem__(self, name, value):
-        super().__setitem__(name, value)
+        super(self.__class__, self).__setitem__(name, value)
         try:
             p = object.__getattribute__(self, '__parent')
             key = object.__getattribute__(self, '__key')
