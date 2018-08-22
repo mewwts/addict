@@ -17,7 +17,7 @@ TEST_VAL = [1, 2, 3]
 TEST_DICT = {'a': {'b': {'c': TEST_VAL}}}
 
 
-class AbstractTestsClass(unittest.TestCase):
+class AbstractTestsClass(object):
     dict_class = None
 
     def test_set_one_level_item(self):
@@ -426,11 +426,11 @@ class AbstractTestsClass(unittest.TestCase):
         self.assertEquals(a, {'y': {'x': 1}})
 
 
-class DictTests(AbstractTestsClass):
+class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict
 
 
-class ChildDictTests(AbstractTestsClass):
+class ChildDictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = CHILD_CLASS
 
 """
