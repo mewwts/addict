@@ -17,7 +17,8 @@ class TestUtils(unittest.TestCase):
             ('test_1', TEST_DICT),
             ('test_2', [TEST_DICT]),
             ('test_3', [1, 1, TEST_DICT]),
-            ('test_4', [1, 1, {'test': TEST_DICT}, 'a'])
+            ('test_4', [1, 1, {'test': TEST_DICT}, 'a']),
+            ('test_5', 1)
         ]
     )
     def test_entity_addict(self, test_name, test_data):
