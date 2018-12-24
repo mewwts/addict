@@ -181,6 +181,25 @@ print(counter)
 >>> print(D)
 {'a': {'b': 3, 'c': 4}}
 ```
+### Decorator
+`addict`s can now support decorators:
+```Python
+>>> @entity_addict
+>>> def hello_entity_addict():
+>>>     return {'test_key': 'test_value'}
+>>> entity = hello_entity_addict()
+>>> print entity.test_key
+test_value
+
+
+>>> @entity_addict
+>>> def hello_entity_addict():
+>>>     return [{'test_key': 'test_value'}]
+>>> entitys = hello_entity_addict()
+>>> for entit in entitys:
+>>>     print entity.test_key
+test_value
+```
 
 ### When is this **especially** useful? 
 This module rose from the entirely tiresome creation of Elasticsearch queries in Python. Whenever you find yourself writing out dicts over multiple lines, just remember that you don't have to. Use *addict* instead.
