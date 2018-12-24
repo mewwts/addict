@@ -42,6 +42,8 @@ def entity_addict(func):
             for value in return_value:
                 if isinstance(value, dict):
                     lists.append(Dict(value))
+                else:
+                    lists.append(value)
             return lists
         elif isinstance(return_value, dict):
             return Dict(return_value)

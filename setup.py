@@ -26,5 +26,6 @@ setup(
     description=SHORT,
     long_description=LONG,
     test_suite='test',
+    tests_require=['parameterized'],
     package_data={'': ['LICENSE']}
 )
