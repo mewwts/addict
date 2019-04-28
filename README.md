@@ -50,7 +50,7 @@ Working with dictionaries are now a *joy*! Setting the items of a nested Dict is
 {'a': {'b': {'c': {'d': {'e': 2}}}}}
 ```
 
-If the `Dict` is instanciated with any iterable values, it will iterate through and clone these values, and turn `dict`s into `Dict`s.
+If the `Dict` is instantiated with any iterable values, it will iterate through and clone these values, and turn `dict`s into `Dict`s.
 Hence, the following works
 ```Python
 >>> mapping = {'a': [{'b': 3}, {'b': 3}]}
