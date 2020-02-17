@@ -1,4 +1,5 @@
 from .addict import Dict
+from .addict import Dict as Addict
 
 
 __title__ = 'addict'
