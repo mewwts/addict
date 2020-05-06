@@ -20,6 +20,8 @@ class Dict(dict):
 
         for key, val in kwargs.items():
             __self[key] = __self._hook(val)
+            
+        object.__setattr__(__self,'__frozen',False)
 
     def __setattr__(self, name, value):
         if hasattr(self.__class__, name):
@@ -29,6 +31,10 @@ class Dict(dict):
             self[name] = value
 
     def __setitem__(self, name, value):
+       if '.' in name:
+            name_split = name.rsplit('.', 1)
+            self.__setitem__(name_split[0],Dict({name_split[1]:value}))
+            return
         super(Dict, self).__setitem__(name, value)
         try:
             p = object.__getattribute__(self, '__parent')
@@ -60,7 +66,16 @@ class Dict(dict):
 
     def __getattr__(self, item):
         return self.__getitem__(item)
-
+        def __getitem__(self, name):
+        if '.' in name:
+            name_split = name.split('.', 1)
+            return self[name_split[0]][name_split[1]]
+        else:
+            if not object.__getattribute__(self,'__frozen'):
+                return super().__getitem__(name)
+            else:
+                return self.to_dict()[name]
+            
     def __missing__(self, name):
         return self.__class__(__parent=self, __key=name)
 
@@ -123,3 +138,15 @@ class Dict(dict):
         else:
             self[key] = default
             return default
+        
+    def get(self, key, default='salope'):
+        try:
+            return self.__getitem__(key)
+        except:
+            return default
+
+    def freeze(__self):
+        object.__setattr__(__self,'__frozen',True)
+
+    def unfreeze(__self):
+        object.__setattr__(__self,'__frozen',False)
