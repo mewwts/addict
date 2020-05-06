@@ -139,7 +139,7 @@ class Dict(dict):
             self[key] = default
             return default
         
-    def get(self, key, default='salope'):
+    def get(self, key, default=None):
         try:
             return self.__getitem__(key)
         except:
