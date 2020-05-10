@@ -6,6 +6,7 @@ class Dict(dict):
     def __init__(__self, *args, **kwargs):
         object.__setattr__(__self, '__parent', kwargs.pop('__parent', None))
         object.__setattr__(__self, '__key', kwargs.pop('__key', None))
+        object.__setattr__(__self, '__frozen', False)
         for arg in args:
             if not arg:
                 continue
@@ -29,6 +30,14 @@ class Dict(dict):
             self[name] = value
 
     def __setitem__(self, name, value):
+        if isinstance(name, str) and '.' in name:
+            name_split = name.rsplit('.', 1)
+            self[name_split[0]][name_split[1]]=value
+            return#+
+        ## superfreezing prevents the creation of new keys (but modification is still possible)
+        ## without this two lines, freezing only prevents the reaction of intermediate keys
+        if hasattr(self,'__frozen') and object.__getattribute__(self, '__frozen') and name not in super().keys():
+            raise KeyError(name)
         super(Dict, self).__setitem__(name, value)
         try:
             p = object.__getattribute__(self, '__parent')
@@ -61,8 +70,17 @@ class Dict(dict):
     def __getattr__(self, item):
         return self.__getitem__(item)
 
+    def __getitem__(self, name):
+        if isinstance(name, str) and '.' in name:
+            name_split = name.split('.', 1)
+            return self[name_split[0]][name_split[1]]
+        else:
+            return super().__getitem__(name)
+
     def __missing__(self, name):
-        return self.__class__(__parent=self, __key=name)
+        if not object.__getattribute__(self,'__frozen'):
+            return self.__class__(__parent=self, __key=name)
+        raise KeyError(name)
 
     def __delattr__(self, name):
         del self[name]
@@ -123,3 +141,35 @@ class Dict(dict):
         else:
             self[key] = default
             return default
+
+    def get(self, key, default=None):
+        #if the dict is not frozen, d.get returns an empty dict in case of non existing key
+        #so we must take care of preserving freeze state
+        frozen=object.__getattribute__(self,'__frozen')
+        if not frozen:
+            self.freeze()
+        try:
+            res= self.__getitem__(key)
+        except:
+            res= default
+        if not frozen:
+            self.unfreeze()
+        return res
+
+    def freeze(__self):
+        object.__setattr__(__self,'__frozen',True)
+        for k in __self.keys():
+            try:
+                __self[k].freeze()
+            except:
+                pass
+        return __self
+
+    def unfreeze(__self):
+        object.__setattr__(__self,'__frozen',False)
+        for k in __self.keys():
+            try:
+                __self[k].unfreeze()
+            except:
+                pass
+        return __self
