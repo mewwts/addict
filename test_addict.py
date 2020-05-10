@@ -425,6 +425,45 @@ class AbstractTestsClass(object):
             self.fail(e)
         self.assertEquals(a, {'y': {'x': 1}})
 
+    def test_set_two_level_items_dotkey(self):
+        some_dict = {'a': {'b': TEST_VAL}}
+        prop = self.dict_class()
+        prop['a.b'] = TEST_VAL
+        self.assertDictEqual(prop, some_dict)
+
+    def test_set_three_level_items_dotkey(self):
+        prop = self.dict_class()
+        prop['a.b.c'] = TEST_VAL
+        self.assertDictEqual(prop, TEST_DICT)
+
+    def test_freeze_read_non_existing_key(self):
+        prop = self.dict_class()
+        prop['a.b.c'] = TEST_VAL
+        with self.assertRaises(KeyError):
+            prop.freeze().a.b.n
+        with self.assertRaises(KeyError):
+            prop.freeze().a.n.c
+        assert prop.unfreeze().a.n.c=={}
+
+    def test_freeze_two_level_set_non_existing_key(self):
+        prop = self.dict_class()
+        prop['a.b.c'] = TEST_VAL
+        with self.assertRaises(KeyError):
+            prop.freeze()['a.b.d']='fail'
+        with self.assertRaises(KeyError):
+            prop.freeze()['a.d.c']='fail'
+        assert prop.unfreeze().a.b.n=={}
+        assert prop.unfreeze().a.n.c=={}
+
+    def test_get_with_default(self):
+        prop = self.dict_class()
+        prop['a.b.c'] = TEST_VAL
+        assert prop.get('a.b.c','default')== TEST_VAL
+        assert prop.get('a.b.d','default')== 'default'
+        assert prop.get('a.d.c','default')== 'default'
+        # check that prop is not locked
+        assert prop.a.n.c=={}
+
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict
