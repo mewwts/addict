@@ -267,6 +267,76 @@ class AbstractTestsClass(object):
             org.update({'a': 2}, {'a': 1})
         org = self.dict_class()
         self.assertRaises(TypeError, update)
+        
+    def test_ior_operator(self):
+        old = self.dict_class()
+        old.child.a = 'a'
+        old.child.b = 'b'
+        old.foo = 'c'
+
+        new = self.dict_class()
+        new.child.b = 'b2'
+        new.child.c = 'c'
+        new.foo.bar = True
+
+        old |= new
+
+        reference = {'foo': {'bar': True},
+                     'child': {'a': 'a', 'c': 'c', 'b': 'b2'}}
+
+        self.assertDictEqual(old, reference)
+
+    def test_ior_operator_with_lists(self):
+        org = self.dict_class()
+        org.a = [1, 2, {'a': 'superman'}]
+        someother = self.dict_class()
+        someother.b = [{'b': 123}]
+        org |= someother
+
+        correct = {'a': [1, 2, {'a': 'superman'}],
+                   'b': [{'b': 123}]}
+
+        org |= someother
+        self.assertDictEqual(org, correct)
+        self.assertIsInstance(org.b[0], dict)
+
+    def test_ior_operator_with_dict(self):
+        org = self.dict_class(one=1, two=2)
+        someother = self.dict_class(one=3)
+        someother |= dict(one=1, two=2)
+        self.assertDictEqual(org, someother)
+
+    def test_or_operator(self):
+        old = self.dict_class()
+        old.child.a = 'a'
+        old.child.b = 'b'
+        old.foo = 'c'
+
+        new = self.dict_class()
+        new.child.b = 'b2'
+        new.child.c = 'c'
+        new.foo.bar = True
+
+        old = old | new
+
+        reference = {'foo': {'bar': True},
+                     'child': {'a': 'a', 'c': 'c', 'b': 'b2'}}
+
+        self.assertDictEqual(old, reference)
+
+    def test_or_operator_with_lists(self):
+        org = self.dict_class()
+        org.a = [1, 2, {'a': 'superman'}]
+        someother = self.dict_class()
+        someother.b = [{'b': 123}]
+        org = org | someother
+
+        correct = {'a': [1, 2, {'a': 'superman'}],
+                   'b': [{'b': 123}]}
+
+        org = org | someother
+        self.assertDictEqual(org, correct)
+        self.assertIsInstance(org.b[0], dict)
 
     def test_hook_in_constructor(self):
         a_dict = self.dict_class(TEST_DICT)
@@ -415,7 +485,7 @@ class AbstractTestsClass(object):
             a[1].x = 3
         except Exception as e:
             self.fail(e)
-        self.assertEquals(a, {'keys': {'x': 1}, 1: {'x': 3}})
+        self.assertEqual(a, {'keys': {'x': 1}, 1: {'x': 3}})
 
     def test_parent_key_prop(self):
         a = self.dict_class()
@@ -423,7 +493,7 @@ class AbstractTestsClass(object):
             a.y.x = 1
         except AttributeError as e:
             self.fail(e)
-        self.assertEquals(a, {'y': {'x': 1}})
+        self.assertEqual(a, {'y': {'x': 1}})
 
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
