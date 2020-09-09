@@ -118,14 +118,14 @@ class Dict(dict):
         self.update(state)
 
     def __or__(self, other):
-        if not isinstance(other, Dict):
+        if not isinstance(other, (Dict, dict)):
             return NotImplemented
         new = Dict(self)
         new.update(other)
         return new
 
     def __ror__(self, other):
-        if not isinstance(other, Dict):
+        if not isinstance(other, (Dict, dict)):
             return NotImplemented
         new = Dict(other)
         new.update(self)

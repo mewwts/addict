@@ -337,6 +337,31 @@ class AbstractTestsClass(object):
         org = org | someother
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org.b[0], dict)
+    
+    def test_ror_operator(self):
+        org = dict()
+        org['a'] = [1, 2, {'a': 'superman'}]
+        someother = self.dict_class()
+        someother.b = [{'b': 123}]
+        org = org | someother
+
+        correct = {'a': [1, 2, {'a': 'superman'}],
+                   'b': [{'b': 123}]}
+
+        org = org | someother
+        self.assertDictEqual(org, correct)
+        self.assertIsInstance(org, Dict)
+        self.assertIsInstance(org.b[0], dict)
+  
+    def test_or_operator_type_error(self):
+        old = self.dict_class()
+        with self.assertRaises(TypeError):
+            old | 'test'
+
+    def test_ror_operator_type_error(self):
+        old = self.dict_class()
+        with self.assertRaises(TypeError):
+            'test' | old
 
     def test_hook_in_constructor(self):
         a_dict = self.dict_class(TEST_DICT)
