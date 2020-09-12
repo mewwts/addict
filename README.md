@@ -108,6 +108,17 @@ However, the following is fine
 ```
 just like a regular `dict`. There are no restrictions (other than what a regular dict imposes) regarding what keys you can use.
 
+### Default values
+For keys that are not in the dictionary, addict behaves like ```defaultdict(Dict)```, so missing keys return an empty ```Dict```
+rather than raising ```KeyError```.
+If this behaviour is not desired, it can be overriden using
+```Python
+>>> class DictNoDefault(Dict):
+>>>     def __missing__(self, key):
+>>>         raise KeyError(key)
+```
+but beware that you will then lose the shorthand assignment functionality (```addicted.a.b.c.d.e = 2```).
+
 ### Recursive Fallback to dict
 If you don't feel safe shipping your addict around to other modules, use the `to_dict()`-method, which returns a regular dict clone of the addict dictionary.
 
