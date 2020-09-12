@@ -1,4 +1,4 @@
-# addict - the Python Dict that's better than heroin.
+# addict (maintainer wanted, please reach out.)
 [![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict) [![PyPI version](https://badge.fury.io/py/addict.svg)](https://badge.fury.io/py/addict) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/addict/badges/version.svg)](https://anaconda.org/conda-forge/addict) [![Supportwith-Ether Badge](https://img.shields.io/badge/Support%20with-ETH-green.svg)](https://supportwith.xyz/ether/0x77D52D817bbb513F827e4E976D425f4FA1618350)
 
 addict is a Python module that gives you dictionaries whose values are both gettable and settable using attributes, in addition to standard item-syntax.
