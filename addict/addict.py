@@ -117,6 +117,24 @@ class Dict(dict):
     def __setstate__(self, state):
         self.update(state)
 
+    def __or__(self, other):
+        if not isinstance(other, (Dict, dict)):
+            return NotImplemented
+        new = Dict(self)
+        new.update(other)
+        return new
+
+    def __ror__(self, other):
+        if not isinstance(other, (Dict, dict)):
+            return NotImplemented
+        new = Dict(other)
+        new.update(self)
+        return new
+
+    def __ior__(self, other):
+        self.update(other)
+        return self
+
     def setdefault(self, key, default=None):
         if key in self:
             return self[key]
