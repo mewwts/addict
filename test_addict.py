@@ -520,6 +520,61 @@ class AbstractTestsClass(object):
             self.fail(e)
         self.assertEqual(a, {'y': {'x': 1}})
 
+    def test_top_freeze_against_top_key(self):
+        "Test that d.freeze() produces KeyError on d.missing."
+        d = self.dict_class()
+        self.assertEqual(d.missing, {})
+        d.freeze()
+        with self.assertRaises(KeyError):
+            d.missing
+        d.unfreeze()
+        self.assertEqual(d.missing, {})
+
+    def test_top_freeze_against_nested_key(self):
+        "Test that d.freeze() produces KeyError on d.inner.missing."
+        d = self.dict_class()
+        d.inner.present = TEST_VAL
+        self.assertIn("inner", d)
+        self.assertEqual(d.inner.missing, {})
+        d.freeze()
+        with self.assertRaises(KeyError):
+            d.inner.missing
+        with self.assertRaises(KeyError):
+            d.missing
+        d.unfreeze()
+        self.assertEqual(d.inner.missing, {})
+        self.assertEqual(d.missing, {})
+
+    def test_nested_freeze_against_top_level(self):
+        "Test that d.inner.freeze() leaves top-level `d` unfrozen."
+        d = self.dict_class()
+        d.inner.present = TEST_VAL
+        self.assertEqual(d.inner.present, TEST_VAL)
+        self.assertEqual(d.inner.missing, {})
+        self.assertEqual(d.missing, {})
+        d.inner.freeze()
+        with self.assertRaises(KeyError):
+            d.inner.missing             # d.inner is frozen
+        self.assertEqual(d.missing, {}) # but not `d` itself
+        d.inner.unfreeze()
+        self.assertEqual(d.inner.missing, {})
+
+    def test_top_freeze_allows_key_addition(self):
+        "Test that d.freeze() allows setting d.missing (but not d.missing.foo)"
+        d = self.dict_class()
+        d.freeze()
+        with self.assertRaises(KeyError):
+            d.keyX
+        with self.assertRaises(KeyError):
+            d.keyY
+        d.keyX = TEST_VAL
+        self.assertEqual(d.keyX, TEST_VAL)
+        with self.assertRaises(KeyError):
+            d.keyY.insideY = TEST_VAL
+        d.unfreeze()
+        d.keyY.insideY = TEST_VAL
+        self.assertEqual(d.keyY.insideY, TEST_VAL)
+
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict
