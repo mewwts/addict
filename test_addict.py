@@ -559,22 +559,18 @@ class AbstractTestsClass(object):
         d.inner.unfreeze()
         self.assertEqual(d.inner.missing, {})
 
-    def test_top_freeze_allows_key_addition(self):
-        "Test that d.freeze() allows setting d.missing (but not d.missing.foo)"
-        d = self.dict_class()
+    def test_top_freeze_disallows_new_key_addition(self):
+        "Test that d.freeze() disallows adding new keys in d."
+        d = self.dict_class({"oldKey": None})
         d.freeze()
+        d.oldKey = TEST_VAL         # Can set pre-existing key.
+        self.assertEqual(d.oldKey, TEST_VAL)
         with self.assertRaises(KeyError):
-            d.keyX
-        with self.assertRaises(KeyError):
-            d.keyY
-        d.keyX = TEST_VAL
-        self.assertEqual(d.keyX, TEST_VAL)
-        with self.assertRaises(KeyError):
-            d.keyY.insideY = TEST_VAL
+            d.newKey = TEST_VAL     # But can't add a new key.
+        self.assertNotIn("newKey", d)
         d.unfreeze()
-        d.keyY.insideY = TEST_VAL
-        self.assertEqual(d.keyY.insideY, TEST_VAL)
-
+        d.newKey = TEST_VAL
+        self.assertEqual(d.newKey, TEST_VAL)
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict

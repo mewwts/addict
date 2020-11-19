@@ -30,6 +30,10 @@ class Dict(dict):
             self[name] = value
 
     def __setitem__(self, name, value):
+        isFrozen = (hasattr(self, '__frozen') and
+                    object.__getattribute__(self, '__frozen'))
+        if isFrozen and name not in super(Dict, self).keys():
+                raise KeyError(name)
         super(Dict, self).__setitem__(name, value)
         try:
             p = object.__getattribute__(self, '__parent')
