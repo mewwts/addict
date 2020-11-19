@@ -1,4 +1,4 @@
-# addict (maintainer wanted, please reach out.)
+# addict
 [![build Status](https://travis-ci.org/mewwts/addict.svg?branch=master)](https://travis-ci.org/mewwts/addict) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict) [![PyPI version](https://badge.fury.io/py/addict.svg)](https://badge.fury.io/py/addict) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/addict/badges/version.svg)](https://anaconda.org/conda-forge/addict)
 
 addict is a Python module that gives you dictionaries whose values are both gettable and settable using attributes, in addition to standard item-syntax.
