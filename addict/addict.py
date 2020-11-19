@@ -6,6 +6,7 @@ class Dict(dict):
     def __init__(__self, *args, **kwargs):
         object.__setattr__(__self, '__parent', kwargs.pop('__parent', None))
         object.__setattr__(__self, '__key', kwargs.pop('__key', None))
+        object.__setattr__(__self, '__frozen', False)
         for arg in args:
             if not arg:
                 continue
@@ -29,6 +30,10 @@ class Dict(dict):
             self[name] = value
 
     def __setitem__(self, name, value):
+        isFrozen = (hasattr(self, '__frozen') and
+                    object.__getattribute__(self, '__frozen'))
+        if isFrozen and name not in super(Dict, self).keys():
+                raise KeyError(name)
         super(Dict, self).__setitem__(name, value)
         try:
             p = object.__getattribute__(self, '__parent')
@@ -62,6 +67,8 @@ class Dict(dict):
         return self.__getitem__(item)
 
     def __missing__(self, name):
+        if object.__getattribute__(self, '__frozen'):
+            raise KeyError(name)
         return self.__class__(__parent=self, __key=name)
 
     def __delattr__(self, name):
@@ -141,3 +148,12 @@ class Dict(dict):
         else:
             self[key] = default
             return default
+
+    def freeze(self, shouldFreeze=True):
+        object.__setattr__(self, '__frozen', shouldFreeze)
+        for key, val in self.items():
+            if isinstance(val, Dict):
+                val.freeze(shouldFreeze)
+
+    def unfreeze(self):
+        self.freeze(False)
