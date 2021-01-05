@@ -111,7 +111,7 @@ just like a regular `dict`. There are no restrictions (other than what a regular
 ### Default values
 For keys that are not in the dictionary, addict behaves like ```defaultdict(Dict)```, so missing keys return an empty ```Dict```
 rather than raising ```KeyError```.
-If this behaviour is not desired, it can be overriden using
+If this behaviour is not desired, it can be overridden using
 ```Python
 >>> class DictNoDefault(Dict):
 >>>     def __missing__(self, key):
