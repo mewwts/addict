@@ -66,6 +66,13 @@ class Dict(dict):
     def __getattr__(self, item):
         return self.__getitem__(item)
 
+    def __getitem__(self, key):
+        if '.' in key:
+            key_split = key.split('.', 1)
+            return self[key_split[0]][key_split[1]]
+        else:
+            return super().__getitem__(key)
+    
     def __missing__(self, name):
         if object.__getattribute__(self, '__frozen'):
             raise KeyError(name)
