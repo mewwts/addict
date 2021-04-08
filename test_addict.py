@@ -394,6 +394,38 @@ class AbstractTestsClass(object):
         b.child = "new stuff"
         self.assertTrue(isinstance(a.child, self.dict_class))
 
+    def test_copy_with_freeze(self):
+        class MyMutableObject(object):
+
+            def __init__(self):
+                self.attribute = None
+
+        foo = MyMutableObject()
+        foo.attribute = True
+
+        a = self.dict_class()
+        a.child.immutable = 42
+        a.child.mutable = foo
+        a.freeze()
+
+        b = a.copy()
+
+        # immutable object should not change
+        b.child.immutable = 21
+        self.assertEqual(a.child.immutable, 21)
+
+        # mutable object should change
+        b.child.mutable.attribute = False
+        self.assertEqual(a.child.mutable.attribute, b.child.mutable.attribute)
+
+        # changing child of b should not affect a
+        b.child = "new stuff"
+        self.assertTrue(isinstance(a.child, self.dict_class))
+
+        # b should be frozen
+        with self.assertRaises(KeyError):
+            b.missing
+
     def test_deepcopy(self):
         class MyMutableObject(object):
             def __init__(self):
@@ -449,6 +481,16 @@ class AbstractTestsClass(object):
     def test_pickle(self):
         a = self.dict_class(TEST_DICT)
         self.assertEqual(a, pickle.loads(pickle.dumps(a)))
+
+    def test_pickle_with_freeze(self):
+        a = self.dict_class(TEST_DICT)
+        a.freeze()
+        aa = pickle.loads(pickle.dumps(a))
+        self.assertEqual(a, aa)
+        with self.assertRaises(KeyError):
+            a.missing
+        with self.assertRaises(KeyError):
+            aa.missing
 
     def test_add_on_empty_dict(self):
         d = self.dict_class()
