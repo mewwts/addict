@@ -2,6 +2,7 @@ import json
 import copy
 import unittest
 import pickle
+import collections
 from addict import Dict
 
 
@@ -571,6 +572,17 @@ class AbstractTestsClass(object):
         d.unfreeze()
         d.newKey = TEST_VAL
         self.assertEqual(d.newKey, TEST_VAL)
+
+    def test_to_dict_with_namedtuple(self):
+        MyNamedTuple = collections.namedtuple("MyNamedTuple", ["x", "y"])
+        nested = {'a': MyNamedTuple({'a': 0}, {2: 0})}
+        prop = self.dict_class(nested)
+        regular = prop.to_dict()
+        self.assertDictEqual(regular, prop)
+        self.assertDictEqual(regular, nested)
+        self.assertIsInstance(regular['a'], MyNamedTuple)
+        self.assertNotIsInstance(regular['a'][0], self.dict_class)
+        self.assertNotIsInstance(regular['a'].x, self.dict_class)
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict
