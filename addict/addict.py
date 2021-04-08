@@ -60,7 +60,12 @@ class Dict(dict):
         if isinstance(item, dict):
             return cls(item)
         elif isinstance(item, (list, tuple)):
-            return type(item)(cls._hook(elem) for elem in item)
+            try:
+                return type(item)(cls._hook(elem) for elem in item)
+            except TypeError:
+                # some subclasses don't implement a constructor that
+                # accepts a generator, e.g. namedtuple
+                return type(item)(*(cls._hook(elem) for elem in item))
         return item
 
     def __getattr__(self, item):
@@ -80,9 +85,16 @@ class Dict(dict):
             if isinstance(value, type(self)):
                 base[key] = value.to_dict()
             elif isinstance(value, (list, tuple)):
-                base[key] = type(value)(
-                    item.to_dict() if isinstance(item, type(self)) else
-                    item for item in value)
+                try:
+                    base[key] = type(value)(
+                        item.to_dict() if isinstance(item, type(self)) else
+                        item for item in value)
+                except TypeError:
+                    # some subclasses don't implement a constructor that
+                    # accepts a generator, e.g. namedtuple
+                    base[key] = type(value)(*(
+                        item.to_dict() if isinstance(item, type(self)) else
+                        item for item in value))
             else:
                 base[key] = value
         return base
