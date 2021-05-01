@@ -161,15 +161,13 @@ class Dict(dict):
         self.freeze(False)
 
     def json(self, force=True):
-        base = self.to_dict()
+        base = {}
         for key, value in self.items():
-            if isinstance(value, type(self)):
-                base[key] = value.json()
-            elif isinstance(value, dict):
+            if isinstance(value, (type(self), dict)):
                 base[key] = Dict(value).json()
             elif isinstance(value, (list, tuple)):
                 base[key] = list(
-                    (Dict(item).json() if callable(item.json) else item.json)
+                    (Dict(item).json() if callable(item.json) else Dict(item).json)
                     if isinstance(item, (type(self), dict)) or hasattr(item, "json")
                     else item
                     if isinstance(item, (int, float, bool, str, type(None)))
