@@ -2,6 +2,8 @@ import json
 import copy
 import unittest
 import pickle
+import uuid
+from inspect import cleandoc
 from addict import Dict
 
 
@@ -267,7 +269,7 @@ class AbstractTestsClass(object):
             org.update({'a': 2}, {'a': 1})
         org = self.dict_class()
         self.assertRaises(TypeError, update)
-        
+
     def test_ior_operator(self):
         old = self.dict_class()
         old.child.a = 'a'
@@ -337,7 +339,7 @@ class AbstractTestsClass(object):
         org = org | someother
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org.b[0], dict)
-    
+
     def test_ror_operator(self):
         org = dict()
         org['a'] = [1, 2, {'a': 'superman'}]
@@ -352,7 +354,7 @@ class AbstractTestsClass(object):
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org, Dict)
         self.assertIsInstance(org.b[0], dict)
-  
+
     def test_or_operator_type_error(self):
         old = self.dict_class()
         with self.assertRaises(TypeError):
@@ -571,6 +573,75 @@ class AbstractTestsClass(object):
         d.unfreeze()
         d.newKey = TEST_VAL
         self.assertEqual(d.newKey, TEST_VAL)
+
+    def test_json_conversion(self):
+        "Test that d.json() returns a JSON compatible nested dict."
+        class JsonClassMethod(object):  # not JSON serializable
+            def json(self):  # but implements json, so will use it to serialize
+                return {"json": "class"}
+
+        # same thing, but using property instead of method
+        class JsonClassProperty(object):
+            @property
+            def json(self):
+                return {"json": "attr"}
+
+        _uuid = uuid.uuid4()  # not serializable directly, but string repr
+        d = self.dict_class({"dict": {"other": "value", "key":  {"ok": "no"}},
+                             "meth": {"cls": JsonClassMethod()},
+                             "prop": JsonClassProperty(),
+                             "sub": Dict({"ok": 1}),  # nested
+                             "uuid": _uuid,
+                             "tuple": (1, 2, 3, False),  # to JSON array
+                             "list": [
+                                 "1", 2, 3.3, None, {"dict": {"ok": True}}
+                             ]})
+        expect = {
+            "dict": {"other": "value", "key":  {"ok": "no"}},
+            "meth": {"cls": {"json": "class"}},
+            "prop": {"json": "attr"},
+            "sub": {"ok": 1},
+            "uuid": str(_uuid),
+            "tuple": [1, 2, 3, False],
+            "list": ["1", 2, 3.3, None, {"dict": {"ok": True}}]
+        }
+        import difflib
+        print(difflib.context_diff(json.dumps(d.json(), indent=2).splitlines(),
+                                   json.dumps(expect, indent=2).splitlines()))
+        assert d.json() == expect
+        self.assertEqual(d.json(), expect)
+
+    def test_json_repr(self):
+        class JsonRepr(self.dict_class):
+            # must enforce JSON repr method, so that existing repr don't break
+            # (backward compatibility)
+            __json__ = True
+
+        data = {"dict": Dict({"a": 1, "b": None}),
+                "list": [Dict({"c": 3, "d": "ok"}), 4.5]}
+        d = JsonRepr(data)
+        _repr = cleandoc("""
+        test_addict.JsonRepr
+        {
+          "dict": {
+            "a": 1,
+            "b": null
+          },
+          "list": [
+            {
+              "c": 3,
+              "d": "ok"
+            },
+            4.5
+          ]
+        }
+        """)
+        self.assertEqual(repr(d), _repr)
+
+        # check that normal repr still works as usual (__json__ = False)
+        d = self.dict_class(data)
+        self.assertEqual(repr(d), str(data))
+
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict

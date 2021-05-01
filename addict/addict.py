@@ -1,7 +1,9 @@
 import copy
+import json
 
 
 class Dict(dict):
+    __json__ = False  # override this for JSON representation
 
     def __init__(__self, *args, **kwargs):
         object.__setattr__(__self, '__parent', kwargs.pop('__parent', None))
@@ -157,3 +159,34 @@ class Dict(dict):
 
     def unfreeze(self):
         self.freeze(False)
+
+    def json(self):
+        base = self.to_dict()
+        for key, value in self.items():
+            if isinstance(value, type(self)):
+                base[key] = value.json()
+            elif isinstance(value, (list, tuple)):
+                base[key] = list(
+                    (Dict(item).json() if callable(item.json) else item.json)
+                    if isinstance(item, type(self)) or hasattr(item, "json")
+                    else item
+                    if isinstance(item, (int, float, bool, str, type(None)))
+                    else str(item)
+                    for item in value)
+            elif isinstance(value, (int, float, bool, str, type(None))):
+                base[key] = value
+            elif hasattr(value, "json"):
+                base[key] = value.json() if callable(value.json) else value.json
+            else:
+                base[key] = str(value)
+        return base
+
+    def __repr__(self):
+        if self.__json__:
+            cls = type(self)
+            try:
+                repr_ = json.dumps(self.json(), indent=2, ensure_ascii=False)
+            except Exception:  # noqa
+                repr_ = dict.__repr__(self)
+            return "{0}.{1}\n{2}".format(cls.__module__, cls.__name__, repr_)
+        return dict.__repr__(self)
