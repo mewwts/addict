@@ -1,5 +1,6 @@
-import json
+import collections
 import copy
+import json
 import unittest
 import pickle
 import uuid
@@ -605,10 +606,6 @@ class AbstractTestsClass(object):
             "tuple": [1, 2, 3, False],
             "list": ["1", 2, 3.3, None, {"dict": {"ok": True}}]
         }
-        import difflib
-        print(difflib.context_diff(json.dumps(d.json(), indent=2).splitlines(),
-                                   json.dumps(expect, indent=2).splitlines()))
-        assert d.json() == expect
         self.assertEqual(d.json(), expect)
 
     def test_json_repr(self):
@@ -617,8 +614,13 @@ class AbstractTestsClass(object):
             # (backward compatibility)
             __json__ = True
 
-        data = {"dict": Dict({"a": 1, "b": None}),
-                "list": [Dict({"c": 3, "d": "ok"}), 4.5]}
+        # patch for Python < 2.7
+        _dict = collections.OrderedDict
+
+        data = _dict([
+            ("dict", Dict(_dict([("a", 1), ("b", None)]))),
+            ("list", [Dict(_dict([("c", 3), ("d", "ok")])), 4.5])
+        ])
         d = JsonRepr(data)
         _repr = cleandoc("""
         test_addict.JsonRepr
@@ -639,6 +641,9 @@ class AbstractTestsClass(object):
         self.assertEqual(repr(d), _repr)
 
         # check that normal repr still works as usual (__json__ = False)
+        # don't need OrderedDict for Python 2.7 because handled the same way
+        data = {"dict": Dict({"a": 1, "b": None}),
+                "list": [Dict({"c": 3, "d": "ok"}), 4.5]}
         d = self.dict_class(data)
         self.assertEqual(repr(d), str(data))
 
