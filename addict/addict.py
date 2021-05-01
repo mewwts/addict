@@ -160,7 +160,7 @@ class Dict(dict):
     def unfreeze(self):
         self.freeze(False)
 
-    def json(self):
+    def json(self, force=True):
         base = self.to_dict()
         for key, value in self.items():
             if isinstance(value, type(self)):
@@ -173,22 +173,23 @@ class Dict(dict):
                     if isinstance(item, (type(self), dict)) or hasattr(item, "json")
                     else item
                     if isinstance(item, (int, float, bool, str, type(None)))
-                    else str(item)
+                    else str(item) if force else item
                     for item in value)
             elif isinstance(value, (int, float, bool, str, type(None))):
                 base[key] = value
             elif hasattr(value, "json"):
                 base[key] = value.json() if callable(value.json) else value.json
             else:
-                base[key] = str(value)
+                base[key] = str(value) if force else value
         return base
 
     def __repr__(self):
         if self.__json__:
             cls = type(self)
             try:
-                repr_ = json.dumps(self.json(), indent=2, ensure_ascii=False)
+                repr_ = json.dumps(self.json(force=False),
+                                   indent=2, ensure_ascii=False)
             except Exception:  # noqa
-                repr_ = dict.__repr__(self)
+                return dict.__repr__(self)
             return "{0}.{1}\n{2}".format(cls.__module__, cls.__name__, repr_)
         return dict.__repr__(self)

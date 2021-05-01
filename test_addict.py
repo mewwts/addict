@@ -3,9 +3,17 @@ import copy
 import json
 import unittest
 import pickle
+import sys
 import uuid
 from inspect import cleandoc
 from addict import Dict
+
+# patch auto ordered dict for Python < 3.7
+# whenever tests need ordering compatibility
+if sys.version_info < (3, 7):
+    _dict = collections.OrderedDict
+else:
+    _dict = dict
 
 
 # test whether unittests pass on child classes
@@ -609,22 +617,25 @@ class AbstractTestsClass(object):
         self.assertEqual(d.json(), expect)
 
     def test_json_repr(self):
+        "Test that JSON representation is used when requested with __json__"
         class JsonRepr(self.dict_class):
             # must enforce JSON repr method, so that existing repr don't break
             # (backward compatibility)
             __json__ = True
 
-        # patch for Python < 2.7
-        _dict = collections.OrderedDict
-
         data = _dict([
-            ("dict", Dict(_dict([("a", 1), ("b", None)]))),
+            ("top", _dict([("x", 0), ("y", -1)])),
+            ("dict", self.dict_class(_dict([("a", 1), ("b", None)]))),
             ("list", [Dict(_dict([("c", 3), ("d", "ok")])), 4.5])
         ])
         d = JsonRepr(data)
         _repr = cleandoc("""
         test_addict.JsonRepr
         {
+          "top": {
+            "x": 0,
+            "y": -1
+          },
           "dict": {
             "a": 1,
             "b": null
@@ -638,6 +649,8 @@ class AbstractTestsClass(object):
           ]
         }
         """)
+        if sys.version_info < (3, ):
+            _repr = _repr.replace(",\n", ", \n")
         self.assertEqual(repr(d), _repr)
 
         # check that normal repr still works as usual (__json__ = False)
@@ -646,6 +659,21 @@ class AbstractTestsClass(object):
                 "list": [Dict({"c": 3, "d": "ok"}), 4.5]}
         d = self.dict_class(data)
         self.assertEqual(repr(d), str(data))
+
+    def test_json_repr_not_serializable(self):
+        "Test that failing JSON representation falls back to the dict repr"
+        class JsonRepr(self.dict_class):
+            __json__ = True
+
+        class NotSerializable(object):
+            pass
+
+        data = _dict({"x": 1, "y": NotSerializable()})
+        json_d = JsonRepr(data)
+        dict_d = self.dict_class(data)
+        json_r = repr(json_d)  # shouldn't raise
+        dict_r = repr(dict_d)  # normal repr
+        self.assertEqual(json_r, dict_r)
 
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
