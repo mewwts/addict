@@ -53,6 +53,10 @@ docs/_build/
 # PyBuilder
 target/
 
-
-#OSX Files
+# OSX Files
 .DS_Store
+
+# IDE caches
+.idea/
+.vscode/
+

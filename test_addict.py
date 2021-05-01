@@ -1,8 +1,19 @@
-import json
+import collections
 import copy
+import json
 import unittest
 import pickle
+import sys
+import uuid
+from inspect import cleandoc
 from addict import Dict
+
+# patch auto ordered dict for Python < 3.7
+# whenever tests need ordering compatibility
+if sys.version_info < (3, 7):
+    _dict = collections.OrderedDict
+else:
+    _dict = dict
 
 
 # test whether unittests pass on child classes
@@ -267,7 +278,7 @@ class AbstractTestsClass(object):
             org.update({'a': 2}, {'a': 1})
         org = self.dict_class()
         self.assertRaises(TypeError, update)
-        
+
     def test_ior_operator(self):
         old = self.dict_class()
         old.child.a = 'a'
@@ -337,7 +348,7 @@ class AbstractTestsClass(object):
         org = org | someother
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org.b[0], dict)
-    
+
     def test_ror_operator(self):
         org = dict()
         org['a'] = [1, 2, {'a': 'superman'}]
@@ -352,7 +363,7 @@ class AbstractTestsClass(object):
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org, Dict)
         self.assertIsInstance(org.b[0], dict)
-  
+
     def test_or_operator_type_error(self):
         old = self.dict_class()
         with self.assertRaises(TypeError):
@@ -571,6 +582,99 @@ class AbstractTestsClass(object):
         d.unfreeze()
         d.newKey = TEST_VAL
         self.assertEqual(d.newKey, TEST_VAL)
+
+    def test_json_conversion(self):
+        "Test that d.json() returns a JSON compatible nested dict."
+        class JsonClassMethod(object):  # not JSON serializable
+            def json(self):  # but implements json, so will use it to serialize
+                return {"json": "class"}
+
+        # same thing, but using property instead of method
+        class JsonClassProperty(object):
+            @property
+            def json(self):
+                return {"json": "attr"}
+
+        _uuid = uuid.uuid4()  # not serializable directly, but string repr
+        d = self.dict_class({"dict": {"other": "value", "key":  {"ok": "no"}},
+                             "meth": {"cls": JsonClassMethod()},
+                             "prop": JsonClassProperty(),
+                             "sub": Dict({"ok": 1}),  # nested
+                             "uuid": _uuid,
+                             "tuple": (1, 2, 3, False),  # to JSON array
+                             "list": [
+                                 "1", 2, 3.3, None, {"dict": {"ok": True}}
+                             ]})
+        expect = {
+            "dict": {"other": "value", "key":  {"ok": "no"}},
+            "meth": {"cls": {"json": "class"}},
+            "prop": {"json": "attr"},
+            "sub": {"ok": 1},
+            "uuid": str(_uuid),
+            "tuple": [1, 2, 3, False],
+            "list": ["1", 2, 3.3, None, {"dict": {"ok": True}}]
+        }
+        self.assertEqual(d.json(), expect)
+
+    def test_json_repr(self):
+        "Test that JSON representation is used when requested with __json__"
+        class JsonRepr(self.dict_class):
+            # must enforce JSON repr method, so that existing repr don't break
+            # (backward compatibility)
+            __json__ = True
+
+        data = _dict([
+            ("top", _dict([("x", 0), ("y", -1)])),
+            ("dict", self.dict_class(_dict([("a", 1), ("b", None)]))),
+            ("list", [Dict(_dict([("c", 3), ("d", "ok")])), 4.5])
+        ])
+        d = JsonRepr(data)
+        _repr = cleandoc("""
+        test_addict.JsonRepr
+        {
+          "top": {
+            "x": 0,
+            "y": -1
+          },
+          "dict": {
+            "a": 1,
+            "b": null
+          },
+          "list": [
+            {
+              "c": 3,
+              "d": "ok"
+            },
+            4.5
+          ]
+        }
+        """)
+        if sys.version_info < (3, ):
+            _repr = _repr.replace(",\n", ", \n")
+        self.assertEqual(repr(d), _repr)
+
+        # check that normal repr still works as usual (__json__ = False)
+        # don't need OrderedDict for Python 2.7 because handled the same way
+        data = {"dict": Dict({"a": 1, "b": None}),
+                "list": [Dict({"c": 3, "d": "ok"}), 4.5]}
+        d = self.dict_class(data)
+        self.assertEqual(repr(d), str(data))
+
+    def test_json_repr_not_serializable(self):
+        "Test that failing JSON representation falls back to the dict repr"
+        class JsonRepr(self.dict_class):
+            __json__ = True
+
+        class NotSerializable(object):
+            pass
+
+        data = _dict({"x": 1, "y": NotSerializable()})
+        json_d = JsonRepr(data)
+        dict_d = self.dict_class(data)
+        json_r = repr(json_d)  # shouldn't raise
+        dict_r = repr(dict_d)  # normal repr
+        self.assertEqual(json_r, dict_r)
+
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict
