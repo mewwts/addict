@@ -29,6 +29,34 @@ class Dict(dict):
         else:
             self[name] = value
 
+    def __getitem__(self, key):
+        if '.' in key:
+            # foo.bar
+            first, rest = key.split('.', 1)
+            if first.endswith(']'):
+                # foo[0].bar
+                first = first[:-1]
+                first, index_or_slice = first.split('[', 1)
+                if ':' in index_or_slice:
+                    # slice
+                    slice_param = [int(i) for i in index_or_slice.split(':')]
+                    return super().__getitem__(first)[slice(*slice_param)][rest]
+                else:
+                    # index
+                    return super().__getitem__(first)[int(index_or_slice)][rest]
+            else:
+                return super().__getitem__(first)[rest]
+        elif key.endswith(']'):
+            key = key[:-1]
+            first, index_or_slice = key.split('[', 1)
+            if ':' in index_or_slice:
+                slice_param = [int(i) for i in index_or_slice.split(':')]
+                return super().__getitem__(first)[slice(*slice_param)]
+            else:
+                return super().__getitem__(first)[int(index_or_slice)]
+        else:
+            return super().__getitem__(key)
+
     def __setitem__(self, name, value):
         isFrozen = (hasattr(self, '__frozen') and
                     object.__getattribute__(self, '__frozen'))
