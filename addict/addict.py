@@ -27,7 +27,13 @@ class Dict(dict):
             raise AttributeError("'Dict' object attribute "
                                  "'{0}' is read-only".format(name))
         else:
-            self[name] = value
+            try:
+                self[name] = value
+            except KeyError:
+                self_type = type(self).__name__
+                raise AttributeError(
+                    "'{}' object has no attribute '{}'".format(
+                        self_type, name))
 
     def __setitem__(self, name, value):
         isFrozen = (hasattr(self, '__frozen') and
@@ -64,7 +70,12 @@ class Dict(dict):
         return item
 
     def __getattr__(self, item):
-        return self.__getitem__(item)
+        try:
+            return self.__getitem__(item)
+        except KeyError:
+            self_type = type(self).__name__
+            raise AttributeError("'{}' object has no attribute '{}'".format(
+                self_type, item))
 
     def __missing__(self, name):
         if object.__getattribute__(self, '__frozen'):
