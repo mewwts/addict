@@ -68,7 +68,7 @@ class Dict(dict):
 
     def __missing__(self, name):
         if object.__getattribute__(self, '__frozen'):
-            raise KeyError(name)
+            raise AttributeError(name)
         return self.__class__(__parent=self, __key=name)
 
     def __delattr__(self, name):

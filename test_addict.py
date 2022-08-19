@@ -525,7 +525,7 @@ class AbstractTestsClass(object):
         d = self.dict_class()
         self.assertEqual(d.missing, {})
         d.freeze()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.missing
         d.unfreeze()
         self.assertEqual(d.missing, {})
@@ -537,9 +537,9 @@ class AbstractTestsClass(object):
         self.assertIn("inner", d)
         self.assertEqual(d.inner.missing, {})
         d.freeze()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.inner.missing
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.missing
         d.unfreeze()
         self.assertEqual(d.inner.missing, {})
@@ -553,7 +553,7 @@ class AbstractTestsClass(object):
         self.assertEqual(d.inner.missing, {})
         self.assertEqual(d.missing, {})
         d.inner.freeze()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.inner.missing             # d.inner is frozen
         self.assertEqual(d.missing, {}) # but not `d` itself
         d.inner.unfreeze()
@@ -571,6 +571,59 @@ class AbstractTestsClass(object):
         d.unfreeze()
         d.newKey = TEST_VAL
         self.assertEqual(d.newKey, TEST_VAL)
+
+    def test_getattr_when_top_freeze_against_top_key(self):
+        "Test that d.freeze() is compatible with getattr on d.missing."
+        d = self.dict_class()
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+        d.freeze()
+        with self.assertRaises(AttributeError):
+            getattr(d, "missing")
+        self.assertEqual(getattr(d, "missing", TEST_VAL), TEST_VAL)
+        d.unfreeze()
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+
+    def test_getattr_when_top_freeze_against_nested_key(self):
+        "Test that d.freeze() is compatible when getattr on d.inner.missing."
+        d = self.dict_class()
+        d.inner.present = TEST_VAL
+        self.assertIn("inner", d)
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
+        d.freeze()
+        with self.assertRaises(AttributeError):
+            getattr(d.inner, "missing")
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), TEST_VAL)
+        with self.assertRaises(AttributeError):
+            getattr(d, "missing")
+        self.assertEqual(getattr(d, "missing", TEST_VAL), TEST_VAL)
+        d.unfreeze()
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+
+    def test_getattr_when_nested_freeze_against_top_level(self):
+        "Test that d.inner.freeze() leaves top-level `d` unfrozen."
+        d = self.dict_class()
+        d.inner.present = TEST_VAL
+        self.assertEqual(getattr(d.inner, "present"), TEST_VAL)
+        self.assertEqual(getattr(d.inner, "present", None), TEST_VAL)
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+        d.inner.freeze()
+        with self.assertRaises(AttributeError):
+            getattr(d.inner, "missing")              # d.inner is frozen
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), TEST_VAL)
+        self.assertEqual(getattr(d, "missing"), {}) # but not `d` itself
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+        d.inner.unfreeze()
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict

@@ -115,7 +115,7 @@ If this behaviour is not desired, it can be overridden using
 ```Python
 >>> class DictNoDefault(Dict):
 >>>     def __missing__(self, key):
->>>         raise KeyError(key)
+>>>         raise AttributeError(key)
 ```
 but beware that you will then lose the shorthand assignment functionality (```addicted.a.b.c.d.e = 2```).
 
