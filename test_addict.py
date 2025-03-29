@@ -3,6 +3,7 @@ import copy
 import unittest
 import pickle
 from addict import Dict
+import typing
 
 
 # test whether unittests pass on child classes
@@ -18,7 +19,7 @@ TEST_DICT = {'a': {'b': {'c': TEST_VAL}}}
 
 
 class AbstractTestsClass(object):
-    dict_class = None
+    dict_class: typing.Type[Dict] = None
 
     def test_set_one_level_item(self):
         some_dict = {'a': TEST_VAL}
@@ -218,6 +219,23 @@ class AbstractTestsClass(object):
         self.assertIsInstance(regular['a'], tuple)
         self.assertNotIsInstance(regular['a'][0], self.dict_class)
 
+    def test_to_dict_with_nested_list(self):
+        nested = {'list': [[{'d': 1}]]}
+        prop = self.dict_class(nested)
+        regular = prop.to_dict()
+        self.assertDictEqual(regular, prop)
+        self.assertDictEqual(regular, nested)
+        self.assertIsInstance(regular['list'], list)
+        self.assertIsInstance(regular['list'][0], list)
+        self.assertNotIsInstance(regular['list'][0][0], self.dict_class)
+
+    def test_to_dict_with_nested_dict(self):
+        prop = self.dict_class()
+        prop.a = {'a': Dict({'b': 1})}
+        regular = prop.to_dict()
+        self.assertDictEqual(regular, prop)
+        self.assertNotIsInstance(regular['a']['a'], self.dict_class)
+
     def test_update(self):
         old = self.dict_class()
         old.child.a = 'a'
@@ -323,6 +341,30 @@ class AbstractTestsClass(object):
                      'child': {'a': 'a', 'c': 'c', 'b': 'b2'}}
 
         self.assertDictEqual(old, reference)
+
+    def test_inherited_functions(self):
+
+        class MyDict(self.dict_class):
+
+            def func1(self):
+                return self
+
+            @classmethod
+            def func2(cls):
+                return cls
+
+            @staticmethod
+            def func3():
+                return "func3"
+
+        a = MyDict()
+        b = MyDict()
+        c = a | b
+        self.assertIsNot(c, a)
+        self.assertIsNot(c, b)
+        self.assertEqual(c.func1(), c)
+        self.assertEqual(c.func2(), MyDict)
+        self.assertEqual(c.func3(), "func3")
 
     def test_or_operator_with_lists(self):
         org = self.dict_class()
@@ -524,11 +566,15 @@ class AbstractTestsClass(object):
         "Test that d.freeze() produces KeyError on d.missing."
         d = self.dict_class()
         self.assertEqual(d.missing, {})
+        self.assertEqual(d["missing"], {})
         d.freeze()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.missing
+        with self.assertRaises(KeyError):
+            d["missing"]
         d.unfreeze()
         self.assertEqual(d.missing, {})
+        self.assertEqual(d["missing"], {})
 
     def test_top_freeze_against_nested_key(self):
         "Test that d.freeze() produces KeyError on d.inner.missing."
@@ -536,28 +582,42 @@ class AbstractTestsClass(object):
         d.inner.present = TEST_VAL
         self.assertIn("inner", d)
         self.assertEqual(d.inner.missing, {})
+        self.assertEqual(d.inner["missing"], {})
         d.freeze()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.inner.missing
         with self.assertRaises(KeyError):
+            d.inner["missing"]
+        with self.assertRaises(AttributeError):
             d.missing
+        with self.assertRaises(KeyError):
+            d["missing"]
         d.unfreeze()
         self.assertEqual(d.inner.missing, {})
+        self.assertEqual(d.inner["missing"], {})
         self.assertEqual(d.missing, {})
+        self.assertEqual(d["missing"], {})
 
     def test_nested_freeze_against_top_level(self):
         "Test that d.inner.freeze() leaves top-level `d` unfrozen."
         d = self.dict_class()
         d.inner.present = TEST_VAL
         self.assertEqual(d.inner.present, TEST_VAL)
+        self.assertEqual(d.inner["present"], TEST_VAL)
         self.assertEqual(d.inner.missing, {})
+        self.assertEqual(d.inner["missing"], {})
         self.assertEqual(d.missing, {})
+        self.assertEqual(d["missing"], {})
         d.inner.freeze()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.inner.missing             # d.inner is frozen
+        with self.assertRaises(KeyError):
+            d.inner["missing"]
         self.assertEqual(d.missing, {}) # but not `d` itself
+        self.assertEqual(d["missing"], {})
         d.inner.unfreeze()
         self.assertEqual(d.inner.missing, {})
+        self.assertEqual(d.inner["missing"], {})
 
     def test_top_freeze_disallows_new_key_addition(self):
         "Test that d.freeze() disallows adding new keys in d."
@@ -565,12 +625,123 @@ class AbstractTestsClass(object):
         d.freeze()
         d.oldKey = TEST_VAL         # Can set pre-existing key.
         self.assertEqual(d.oldKey, TEST_VAL)
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             d.newKey = TEST_VAL     # But can't add a new key.
+        with self.assertRaises(KeyError):
+            d["newKey"] = TEST_VAL
         self.assertNotIn("newKey", d)
         d.unfreeze()
         d.newKey = TEST_VAL
         self.assertEqual(d.newKey, TEST_VAL)
+        self.assertEqual(d["newKey"], TEST_VAL)
+
+    def test_pickle_with_freeze(self):
+        a = self.dict_class(TEST_DICT)
+        a.freeze()
+        data = pickle.dumps(a)
+        aa = pickle.loads(data)
+        self.assertEqual(a, aa)
+        with self.assertRaises(AttributeError):
+            a.missing
+        with self.assertRaises(AttributeError):
+            aa.missing
+
+    def test_copy_with_freeze(self):
+        class MyMutableObject(object):
+
+            def __init__(self):
+                self.attribute = None
+
+        foo = MyMutableObject()
+        foo.attribute = True
+
+        a = self.dict_class()
+        a.child.immutable = 42
+        a.child.mutable = foo
+        a.freeze()
+
+        b = a.copy()
+
+        # immutable object should not change
+        b.child.immutable = 21
+        self.assertEqual(a.child.immutable, 21)
+
+        # mutable object should change
+        b.child.mutable.attribute = False
+        self.assertEqual(a.child.mutable.attribute, b.child.mutable.attribute)
+
+        # changing child of b should not affect a
+        b.child = "new stuff"
+        self.assertTrue(isinstance(a.child, self.dict_class))
+
+        # b should be frozen
+        with self.assertRaises(AttributeError):
+            b.missing
+
+    def test_getattr_when_top_freeze_against_top_key(self):
+        "Test that d.freeze() is compatible with getattr on d.missing."
+        d = self.dict_class()
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+        d.freeze()
+        with self.assertRaises(AttributeError):
+            getattr(d, "missing")
+        self.assertEqual(getattr(d, "missing", TEST_VAL), TEST_VAL)
+        d.unfreeze()
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+
+    def test_getattr_when_top_freeze_against_nested_key(self):
+        "Test that d.freeze() is compatible when getattr on d.inner.missing."
+        d = self.dict_class()
+        d.inner.present = TEST_VAL
+        self.assertIn("inner", d)
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
+        d.freeze()
+        with self.assertRaises(AttributeError):
+            getattr(d.inner, "missing")
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), TEST_VAL)
+        with self.assertRaises(AttributeError):
+            getattr(d, "missing")
+        self.assertEqual(getattr(d, "missing", TEST_VAL), TEST_VAL)
+        d.unfreeze()
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+
+    def test_getattr_when_nested_freeze_against_top_level(self):
+        "Test that d.inner.freeze() leaves top-level `d` unfrozen."
+        d = self.dict_class()
+        d.inner.present = TEST_VAL
+        self.assertEqual(getattr(d.inner, "present"), TEST_VAL)
+        self.assertEqual(getattr(d.inner, "present", None), TEST_VAL)
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
+        self.assertEqual(getattr(d, "missing"), {})
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+        d.inner.freeze()
+        with self.assertRaises(AttributeError):
+            getattr(d.inner, "missing")              # d.inner is frozen
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), TEST_VAL)
+        self.assertEqual(getattr(d, "missing"), {})  # but not `d` itself
+        self.assertEqual(getattr(d, "missing", TEST_VAL), {})
+        d.inner.unfreeze()
+        self.assertEqual(getattr(d.inner, "missing"), {})
+        self.assertEqual(getattr(d.inner, "missing", TEST_VAL), {})
+    
+    def test_missing_reference(self):
+        # https://github.com/mewwts/addict/issues/133
+        d = Dict()
+        a1 = d.a
+        a2 = d.a
+        a1.b = 1
+        a1.c = 2
+        self.assertDictEqual(d, {'a': {'b': 1, 'c': 2}})
+        # No matter what order you change the variables in, the final result will not change.
+        a2.d = 3
+        self.assertDictEqual(d, {'a': {'b': 1, 'c': 2, 'd': 3}})
 
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict

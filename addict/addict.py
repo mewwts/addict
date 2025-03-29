@@ -1,12 +1,11 @@
 import copy
+import weakref
 
 
 class Dict(dict):
 
     def __init__(__self, *args, **kwargs):
-        object.__setattr__(__self, '__parent', kwargs.pop('__parent', None))
-        object.__setattr__(__self, '__key', kwargs.pop('__key', None))
-        object.__setattr__(__self, '__frozen', False)
+        _set_state(__self, kwargs)
         for arg in args:
             if not arg:
                 continue
@@ -27,9 +26,27 @@ class Dict(dict):
             raise AttributeError("'Dict' object attribute "
                                  "'{0}' is read-only".format(name))
         else:
-            self[name] = value
+            try:
+                self[name] = value
+            except KeyError:
+                self_type = type(self).__name__
+                raise AttributeError(
+                    "'{}' object has no attribute '{}'".format(
+                        self_type, name))
 
     def __setitem__(self, name, value):
+        if name in _STATE_KEYS:
+            return
+        """Make sure all values are wrapped by `Dict`
+
+If you remove this code, the value will not be wrapped in the following cases
+>>> d = Dict()
+>>> d.a = {'b': 1}
+>>> print(type(d.a))
+<class 'dict'>
+        """
+        if not isinstance(value, Dict):
+            value = type(self)._hook(value)
         isFrozen = (hasattr(self, '__frozen') and
                     object.__getattribute__(self, '__frozen'))
         if isFrozen and name not in super(Dict, self).keys():
@@ -64,12 +81,27 @@ class Dict(dict):
         return item
 
     def __getattr__(self, item):
-        return self.__getitem__(item)
+        try:
+            return self.__getitem__(item)
+        except KeyError:
+            self_type = type(self).__name__
+            raise AttributeError("'{}' object has no attribute '{}'".format(
+                self_type, item))
 
     def __missing__(self, name):
         if object.__getattribute__(self, '__frozen'):
             raise KeyError(name)
-        return self.__class__(__parent=self, __key=name)
+        st: dict = _get_state(self, ['__other_state'])['__other_state']
+        missing_ref = st.get('missing_ref')
+        if missing_ref is None:
+            missing_ref = weakref.WeakValueDictionary()
+            st['missing_ref'] = missing_ref
+
+        if name in missing_ref:
+            return missing_ref[name]
+        ref = self.__class__(__parent=self, __key=name)
+        missing_ref[name] = ref
+        return ref
 
     def __delattr__(self, name):
         del self[name]
@@ -77,14 +109,7 @@ class Dict(dict):
     def to_dict(self):
         base = {}
         for key, value in self.items():
-            if isinstance(value, type(self)):
-                base[key] = value.to_dict()
-            elif isinstance(value, (list, tuple)):
-                base[key] = type(value)(
-                    item.to_dict() if isinstance(item, type(self)) else
-                    item for item in value)
-            else:
-                base[key] = value
+            base[key] = unwrap(value)
         return base
 
     def copy(self):
@@ -119,22 +144,24 @@ class Dict(dict):
         return tuple(self.items())
 
     def __getstate__(self):
-        return self
+        return self.to_dict(), _get_state(self, ['__frozen'])
 
     def __setstate__(self, state):
-        self.update(state)
+        kv, st = state
+        self.update(kv)
+        _set_state(self, st)
 
     def __or__(self, other):
         if not isinstance(other, (Dict, dict)):
             return NotImplemented
-        new = Dict(self)
+        new = type(self)(self)
         new.update(other)
         return new
 
     def __ror__(self, other):
         if not isinstance(other, (Dict, dict)):
             return NotImplemented
-        new = Dict(other)
+        new = type(self)(other)
         new.update(self)
         return new
 
@@ -147,13 +174,50 @@ class Dict(dict):
             return self[key]
         else:
             self[key] = default
-            return default
+            return self[key]
 
     def freeze(self, shouldFreeze=True):
         object.__setattr__(self, '__frozen', shouldFreeze)
-        for key, val in self.items():
+        for _, val in self.items():
             if isinstance(val, Dict):
                 val.freeze(shouldFreeze)
 
     def unfreeze(self):
         self.freeze(False)
+
+
+def unwrap(value):
+    to_dict = getattr(value, 'to_dict', None)
+    if callable(to_dict):
+        return to_dict()
+    elif isinstance(value, (list, tuple)):
+        return type(value)(unwrap(item) for item in value)
+    elif isinstance(value, dict):
+        return {k: unwrap(v) for k, v in value.items()}
+    return value
+
+
+_STATE_KEYS = ['__parent', '__key', '__frozen', '__other_state']
+
+
+def _get_state(d: Dict, ks=None):
+    state = {}
+    for k in _STATE_KEYS:
+        if k not in ks:
+            continue
+        if not hasattr(d, k):
+            state[k] = None
+            continue
+        state[k] = object.__getattribute__(d, k)
+    return state
+
+
+def _set_state(d: Dict, state: dict):
+    for k in _STATE_KEYS:
+        if k not in state:
+            if k == '__other_state':
+                object.__setattr__(d, k, {})
+            else:
+                object.__setattr__(d, k, None)
+            continue
+        object.__setattr__(d, k, state[k])
