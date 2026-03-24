@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import copy
+from collections.abc import Iterable
 from typing import Any
 
 __all__ = ["Dict"]
 
 
 class Dict(dict):
-
     def __init__(__self, *args: Any, **kwargs: Any) -> None:
         object.__setattr__(__self, "_parent", kwargs.pop("__parent", None))
         object.__setattr__(__self, "_key", kwargs.pop("__key", None))
@@ -29,9 +29,7 @@ class Dict(dict):
 
     def __setattr__(self, name: str, value: Any) -> None:
         if hasattr(self.__class__, name):
-            raise AttributeError(
-                f"'Dict' object attribute '{name}' is read-only"
-            )
+            raise AttributeError(f"'Dict' object attribute '{name}' is read-only")
         else:
             self[name] = value
 
@@ -149,7 +147,7 @@ class Dict(dict):
         new.update(self)
         return new
 
-    def __ior__(self, other: dict[Any, Any] | Dict) -> Dict:
+    def __ior__(self, other: dict[Any, Any] | Dict | Iterable[tuple[Any, Any]]) -> Dict:  # type: ignore[override]
         self.update(other)
         return self
 
