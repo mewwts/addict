@@ -1,5 +1,5 @@
 # addict
-![Tests](https://github.com/mewwts/addict/workflows/Python%20test/badge.svg) [![Coverage Status](https://img.shields.io/coveralls/mewwts/addict.svg)](https://coveralls.io/r/mewwts/addict) [![PyPI version](https://badge.fury.io/py/addict.svg)](https://badge.fury.io/py/addict) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/addict/badges/version.svg)](https://anaconda.org/conda-forge/addict)
+![Tests](https://github.com/mewwts/addict/workflows/Tests/badge.svg) [![PyPI version](https://badge.fury.io/py/addict.svg)](https://badge.fury.io/py/addict)
 
 addict is a Python module that gives you dictionaries whose values are both gettable and settable using attributes, in addition to standard item-syntax.
 
@@ -36,7 +36,7 @@ or through `conda`
 conda install addict -c conda-forge
 ```
 
-Addict runs on Python 2 and Python 3, and every build is tested towards 2.7, 3.6 and 3.7. 
+addict requires Python 3.10 or later.
 
 ### Usage
 addict inherits from ```dict```, but is more flexible in terms of accessing and setting its values.
@@ -200,14 +200,14 @@ This module rose from the entirely tiresome creation of Elasticsearch queries in
 As it is a ```dict```, it will serialize into JSON perfectly, and with the to_dict()-method you can feel safe shipping your addict anywhere.
 
 ### Testing, Development and CI
-Issues and Pull Requests are more than welcome. Feel free to open an issue to spark a discussion around a feature or a bug, or simply reply to the existing ones. As for Pull Requests, keeping in touch with the surrounding code style will be appreciated, and as such, writing tests are crucial. Pull requests and commits will be automatically run against TravisCI and coveralls. 
+Issues and Pull Requests are more than welcome.
 
-The unit tests are implemented in the `test_addict.py` file and use the unittest python framework. Running the tests is rather simple:
+This project uses [uv](https://docs.astral.sh/uv/) for development:
 ```sh
-python -m unittest -v test_addict
-
-# - or -
-python test_addict.py
+uv sync              # install dependencies
+uv run pytest        # run tests
+uv run ruff check    # lint
+uv run ty check      # type check
 ```
 
 ### Testimonials
