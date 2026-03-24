@@ -9,9 +9,9 @@ __all__ = ["Dict"]
 
 class Dict(dict):
     def __init__(__self, *args: Any, **kwargs: Any) -> None:
-        object.__setattr__(__self, "_parent", kwargs.pop("__parent", None))
-        object.__setattr__(__self, "_key", kwargs.pop("__key", None))
-        object.__setattr__(__self, "_frozen", False)
+        object.__setattr__(__self, "__parent", kwargs.pop("__parent", None))
+        object.__setattr__(__self, "__key", kwargs.pop("__key", None))
+        object.__setattr__(__self, "__frozen", False)
         for arg in args:
             if not arg:
                 continue
@@ -34,22 +34,22 @@ class Dict(dict):
             self[name] = value
 
     def __setitem__(self, name: Any, value: Any) -> None:
-        is_frozen = hasattr(self, "_frozen") and object.__getattribute__(
-            self, "_frozen"
+        is_frozen = hasattr(self, "__frozen") and object.__getattribute__(
+            self, "__frozen"
         )
         if is_frozen and name not in super().keys():
             raise KeyError(name)
         super().__setitem__(name, value)
         try:
-            p = object.__getattribute__(self, "_parent")
-            key = object.__getattribute__(self, "_key")
+            p = object.__getattribute__(self, "__parent")
+            key = object.__getattribute__(self, "__key")
         except AttributeError:
             p = None
             key = None
         if p is not None:
             p[key] = self
-            object.__delattr__(self, "_parent")
-            object.__delattr__(self, "_key")
+            object.__delattr__(self, "__parent")
+            object.__delattr__(self, "__key")
 
     def __add__(self, other: Any) -> Any:
         if not self.keys():
@@ -73,7 +73,7 @@ class Dict(dict):
         return self.__getitem__(item)
 
     def __missing__(self, name: Any) -> Dict:
-        if object.__getattribute__(self, "_frozen"):
+        if object.__getattribute__(self, "__frozen"):
             raise KeyError(name)
         return self.__class__(__parent=self, __key=name)
 
@@ -159,7 +159,7 @@ class Dict(dict):
             return default
 
     def freeze(self, should_freeze: bool = True) -> None:
-        object.__setattr__(self, "_frozen", should_freeze)
+        object.__setattr__(self, "__frozen", should_freeze)
         for _key, val in self.items():
             if isinstance(val, Dict):
                 val.freeze(should_freeze)
