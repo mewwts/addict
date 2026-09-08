@@ -150,10 +150,20 @@ class Dict(dict):
             return default
 
     def freeze(self, shouldFreeze=True):
-        object.__setattr__(self, '__frozen', shouldFreeze)
-        for key, val in self.items():
-            if isinstance(val, Dict):
-                val.freeze(shouldFreeze)
+        pending = [self]
+        seen = set()
+        while pending:
+            current = pending.pop()
+            if id(current) in seen:
+                continue
+            seen.add(id(current))
+            object.__setattr__(current, '__frozen', shouldFreeze)
+            for val in current.values():
+                if isinstance(val, Dict):
+                    if type(val).freeze is Dict.freeze:
+                        pending.append(val)
+                    else:
+                        val.freeze(shouldFreeze)
 
     def unfreeze(self):
         self.freeze(False)

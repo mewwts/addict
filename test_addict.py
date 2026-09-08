@@ -520,6 +520,49 @@ class AbstractTestsClass(object):
             self.fail(e)
         self.assertEqual(a, {'y': {'x': 1}})
 
+    def test_freeze_calls_child_override(self):
+        calls = []
+
+        class CustomDict(self.dict_class):
+            def freeze(self, shouldFreeze=True):
+                calls.append(shouldFreeze)
+                super(CustomDict, self).freeze(shouldFreeze)
+
+        d = self.dict_class()
+        d.child = CustomDict()
+        d.freeze()
+        d.unfreeze()
+        self.assertEqual(calls, [True, False])
+
+    def test_freeze_cyclic_dict(self):
+        d = self.dict_class()
+        d.self = d
+        d.child.parent = d
+        d.freeze()
+        with self.assertRaises(KeyError):
+            d.new_key = 1
+        with self.assertRaises(KeyError):
+            d.child.new_key = 1
+        d.unfreeze()
+        d.new_key = 1
+        d.child.new_key = 2
+        self.assertIs(d.self, d)
+        self.assertIs(d.child.parent, d)
+
+    def test_freeze_deep_dict(self):
+        d = self.dict_class()
+        current = d
+        for _ in range(1500):
+            child = self.dict_class()
+            current.child = child
+            current = child
+        d.freeze()
+        with self.assertRaises(KeyError):
+            current.new_key = 1
+        d.unfreeze()
+        current.new_key = 1
+        self.assertEqual(current.new_key, 1)
+
     def test_top_freeze_against_top_key(self):
         "Test that d.freeze() produces KeyError on d.missing."
         d = self.dict_class()
