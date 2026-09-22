@@ -63,6 +63,28 @@ class AbstractTestsClass(object):
         prop = self.dict_class((0, 1), (1, 2), (2, 3))
         self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
 
+    def test_init_with_tuple_of_lists(self):
+        pairs = ([0, 1], [1, 2], [2, 3])
+        prop = self.dict_class(pairs)
+        self.assertDictEqual(prop, dict(pairs))
+
+    def test_init_with_tuple_of_one_list(self):
+        prop = self.dict_class((['a', {'b': 2}],))
+        self.assertDictEqual(prop, {'a': {'b': 2}})
+        self.assertIsInstance(prop.a, self.dict_class)
+        self.assertEqual(prop.a.b, 2)
+
+    def test_init_with_tuple_of_mixed_pairs(self):
+        pairs = (['a', 1], ((1, 2), {'b': 3}))
+        prop = self.dict_class(pairs)
+        self.assertDictEqual(prop, dict(pairs))
+        self.assertIsInstance(prop[(1, 2)], self.dict_class)
+
+    def test_init_with_tuple_of_tuples(self):
+        pairs = ((0, 1), (1, 2), (2, 3))
+        prop = self.dict_class(pairs)
+        self.assertDictEqual(prop, dict(pairs))
+
     def test_init_with_list(self):
         prop = self.dict_class([(0, 1), (1, 2), (2, 3)])
         self.assertDictEqual(prop, {0: 1, 1: 2, 2: 3})
