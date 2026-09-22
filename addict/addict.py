@@ -13,7 +13,8 @@ class Dict(dict):
             elif isinstance(arg, dict):
                 for key, val in arg.items():
                     __self[key] = __self._hook(val)
-            elif isinstance(arg, tuple) and (not isinstance(arg[0], tuple)):
+            elif (isinstance(arg, tuple) and
+                  not isinstance(arg[0], (tuple, list))):
                 __self[arg[0]] = __self._hook(arg[1])
             else:
                 for key, val in iter(arg):
