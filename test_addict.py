@@ -209,6 +209,34 @@ class AbstractTestsClass(object):
             regular['a'][0].a = 1
         self.assertRaises(AttributeError, get_attr_deep)
 
+    def _check_to_dict_nested_sequences(self, outer, inner):
+        nested = {'a': outer([inner([{'d': 1}])])}
+        prop = self.dict_class(nested)
+        source_leaf = prop['a'][0][0]
+        regular = prop.to_dict()
+
+        self.assertEqual(regular, nested)
+        self.assertIs(type(regular['a']), outer)
+        self.assertIs(type(regular['a'][0]), inner)
+        self.assertIs(type(regular['a'][0][0]), dict,
+                      'nested mapping must be plain dict')
+        self.assertIs(type(source_leaf), self.dict_class)
+        self.assertIs(prop['a'][0][0], source_leaf)
+        regular['a'][0][0]['d'] = 2
+        self.assertEqual(source_leaf['d'], 1)
+
+    def test_to_dict_nested_lists(self):
+        self._check_to_dict_nested_sequences(list, list)
+
+    def test_to_dict_list_of_tuples(self):
+        self._check_to_dict_nested_sequences(list, tuple)
+
+    def test_to_dict_tuple_of_lists(self):
+        self._check_to_dict_nested_sequences(tuple, list)
+
+    def test_to_dict_nested_tuples(self):
+        self._check_to_dict_nested_sequences(tuple, tuple)
+
     def test_to_dict_with_tuple(self):
         nested = {'a': ({'a': 0}, {2: 0})}
         prop = self.dict_class(nested)

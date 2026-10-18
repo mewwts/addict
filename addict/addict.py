@@ -74,6 +74,15 @@ class Dict(dict):
     def __delattr__(self, name):
         del self[name]
 
+    @staticmethod
+    def _to_dict_recursive(item):
+        """Recursively convert nested addict.Dict objects to plain dicts."""
+        if isinstance(item, Dict):
+            return item.to_dict()
+        elif isinstance(item, (list, tuple)):
+            return type(item)(Dict._to_dict_recursive(elem) for elem in item)
+        return item
+
     def to_dict(self):
         base = {}
         for key, value in self.items():
@@ -81,8 +90,7 @@ class Dict(dict):
                 base[key] = value.to_dict()
             elif isinstance(value, (list, tuple)):
                 base[key] = type(value)(
-                    item.to_dict() if isinstance(item, type(self)) else
-                    item for item in value)
+                    self._to_dict_recursive(item) for item in value)
             else:
                 base[key] = value
         return base
