@@ -112,6 +112,8 @@ class Dict(dict):
                 (not isinstance(self[k], dict)) or
                 (not isinstance(v, dict))):
                 self[k] = v
+            elif type(self[k]) is dict:
+                Dict.update(self[k], v)
             else:
                 self[k].update(v)
 

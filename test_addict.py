@@ -250,6 +250,49 @@ class AbstractTestsClass(object):
         self.assertDictEqual(org, correct)
         self.assertIsInstance(org.b[0], dict)
 
+    def test_update_recurses_into_assigned_dict(self):
+        org = self.dict_class()
+        config = {'db': {'host': 'localhost', 'port': 5432}}
+        database = config['db']
+        org.config = config
+
+        org.update({'config': {'db': {'port': 6432, 'user': 'app'}}})
+
+        self.assertDictEqual(org, {'config': {'db': {
+            'host': 'localhost', 'port': 6432, 'user': 'app'}}})
+        self.assertIs(org.config, config)
+        self.assertIs(org.config['db'], database)
+
+    def test_update_recurses_into_dict_from_previous_update(self):
+        org = self.dict_class()
+        config = {'db': {'host': 'localhost', 'port': 5432}}
+        org.update({'config': config})
+
+        org.update(config={'db': {'port': 6432}})
+
+        self.assertDictEqual(org, {'config': {'db': {
+            'host': 'localhost', 'port': 6432}}})
+        self.assertIs(org.config, config)
+
+    def test_update_preserves_child_update_override(self):
+        class UppercaseDict(dict):
+            def update(self, other):
+                for key, value in other.items():
+                    self[key] = value.upper()
+
+        class UppercaseAddict(self.dict_class):
+            def update(self, other):
+                for key, value in other.items():
+                    self[key] = value.upper()
+
+        for child_class in (UppercaseDict, UppercaseAddict):
+            org = self.dict_class()
+            org.child = child_class()
+
+            org.update({'child': {'status': 'ready'}})
+
+            self.assertEqual(org.child['status'], 'READY')
+
     def test_update_with_kws(self):
         org = self.dict_class(one=1, two=2)
         someother = self.dict_class(one=3)
