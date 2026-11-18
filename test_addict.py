@@ -218,6 +218,12 @@ class AbstractTestsClass(object):
         self.assertIsInstance(regular['a'], tuple)
         self.assertNotIsInstance(regular['a'][0], self.dict_class)
 
+    def test_to_dict_with_nested_lists(self):
+        nested = {'a': [[{'b': 0}]]}
+        regular = self.dict_class(nested).to_dict()
+        self.assertDictEqual(regular, nested)
+        self.assertNotIsInstance(regular['a'][0][0], self.dict_class)
+
     def test_update(self):
         old = self.dict_class()
         old.child.a = 'a'
