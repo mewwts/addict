@@ -59,6 +59,8 @@ class Dict(dict):
     def _hook(cls, item):
         if isinstance(item, dict):
             return cls(item)
+        elif isinstance(item, tuple) and hasattr(item, '_fields'):
+            return type(item)._make(cls._hook(elem) for elem in item)
         elif isinstance(item, (list, tuple)):
             return type(item)(cls._hook(elem) for elem in item)
         return item
@@ -80,7 +82,10 @@ class Dict(dict):
             if isinstance(value, type(self)):
                 base[key] = value.to_dict()
             elif isinstance(value, (list, tuple)):
-                base[key] = type(value)(
+                constructor = type(value)
+                if isinstance(value, tuple) and hasattr(value, '_fields'):
+                    constructor = type(value)._make
+                base[key] = constructor(
                     item.to_dict() if isinstance(item, type(self)) else
                     item for item in value)
             else:
