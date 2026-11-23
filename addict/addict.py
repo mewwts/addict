@@ -1,5 +1,21 @@
 import copy
 
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
+
+try:
+    _string_types = (basestring,)
+except NameError:
+    _string_types = (str, bytes)
+
+
+def _path_keys(path):
+    if isinstance(path, _string_types):
+        raise TypeError('path must be an iterable of keys, not a string')
+    return tuple(path)
+
 
 class Dict(dict):
 
@@ -148,6 +164,36 @@ class Dict(dict):
         else:
             self[key] = default
             return default
+
+    def get_from(self, path, default=None):
+        """Read a relative item path without creating missing mapping keys.
+
+        Missing keys and sequence indices return default. An empty path returns
+        this dictionary. Invalid indexing operations still raise TypeError.
+        """
+        current = self
+        for key in _path_keys(path):
+            if isinstance(current, Mapping) and key not in current:
+                return default
+            try:
+                current = current[key]
+            except (KeyError, IndexError):
+                return default
+        return current
+
+    def set_from(self, path, value):
+        """Assign through a relative item path using normal indexing semantics.
+
+        Dict branches keep their usual missing-key and freeze behavior. Plain
+        mappings and sequences retain their own rules. Values are not copied.
+        """
+        keys = _path_keys(path)
+        if not keys:
+            raise ValueError('cannot assign through an empty path')
+        current = self
+        for key in keys[:-1]:
+            current = current[key]
+        current[keys[-1]] = value
 
     def freeze(self, shouldFreeze=True):
         object.__setattr__(self, '__frozen', shouldFreeze)

@@ -72,6 +72,35 @@ This behavior is limited to the constructor, and not when items are set using at
 True
 ```
 
+### Iterable paths
+
+Use `get_from(path, default=None)` and `set_from(path, value)` when the item
+path is computed at runtime. Paths are relative to the receiving dictionary;
+they do not include the Python variable name.
+
+```python
+>>> data = Dict()
+>>> data.set_from(['users', 'alice', 'score'], 10)
+>>> data.get_from(['users', 'alice', 'score'])
+10
+>>> data.get_from(['users', 'bob', 'score'], 0)
+0
+>>> 'bob' in data.users
+False
+```
+
+Reading never creates missing dictionary keys. Missing keys or sequence indices
+return the default; invalid indexing operations raise `TypeError`. An empty
+read path returns the dictionary itself, while an empty assignment path raises
+`ValueError`. Supply an iterable of keys (including tuples and generators), not
+a dotted string. Dots, slashes and empty strings in individual keys are literal.
+
+Assignment follows ordinary item indexing: missing `Dict` branches are created,
+frozen dictionaries reject new keys, and custom `__missing__` behavior is
+respected. Plain dictionaries retain their usual missing-key errors. Lists can
+be indexed with integers, including negative indices, but are not extended
+automatically. Assigned values and returned branches retain their identity.
+
 ### Stuff to keep in mind
 Remember that ```int```s are not valid attribute names, so keys of the dict that are not strings must be set/get with the get-/setitem syntax
 ```Python

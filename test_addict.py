@@ -572,6 +572,160 @@ class AbstractTestsClass(object):
         d.newKey = TEST_VAL
         self.assertEqual(d.newKey, TEST_VAL)
 
+    def test_paths_get_set_relative_to_receiver(self):
+        d = self.dict_class()
+        self.assertIsNone(d.set_from(['b', 'c'], 10))
+        self.assertEqual(d, {'b': {'c': 10}})
+        self.assertEqual(d.get_from(['b', 'c']), 10)
+        self.assertEqual(d.b.get_from(['c']), 10)
+        d.set_from(('b', 'c'), 20)
+        self.assertEqual(d.b.c, 20)
+        self.assertIsInstance(d.b, self.dict_class)
+
+    def test_paths_do_not_create_missing_keys_on_read(self):
+        d = self.dict_class({'a': {'b': 1}})
+        missing = []
+        self.assertIsNone(d.get_from(['missing']))
+        self.assertIs(d.get_from(['missing', 'child'], missing), missing)
+        self.assertIs(d.get_from(['a', 'missing'], missing), missing)
+        missing.append(2)
+        self.assertEqual(d, {'a': {'b': 1}})
+
+    def test_paths_read_does_not_call_missing(self):
+        class MissingDict(self.dict_class):
+            def __missing__(self, key):
+                raise AssertionError('read called __missing__')
+
+        d = MissingDict()
+        self.assertEqual(d.get_from(['absent'], 42), 42)
+
+    def test_paths_keep_assigned_references(self):
+        d = self.dict_class()
+        value = {'raw': []}
+        d.set_from(['a', 'b'], value)
+        self.assertIs(d.get_from(['a', 'b']), value)
+        self.assertIs(d.get_from(['a']), d.a)
+        d.get_from(['a', 'b', 'raw']).append(1)
+        self.assertEqual(value, {'raw': [1]})
+
+    def test_paths_preserve_false_values(self):
+        d = self.dict_class()
+        for value in (0, False, None, '', [], {}):
+            d.set_from(['a', 'b'], value)
+            self.assertIs(d.get_from(['a', 'b'], object()), value)
+
+    def test_paths_accept_nonstring_and_literal_keys(self):
+        d = self.dict_class()
+        path = [1, ('a', 'b'), 'a.b/c', '']
+        d.set_from(path, 5)
+        self.assertEqual(d.get_from(path), 5)
+        self.assertEqual(d[1][('a', 'b')]['a.b/c'][''], 5)
+
+    def test_paths_accept_keys_named_after_methods(self):
+        d = self.dict_class()
+        d.set_from(['items', 'get_from', 'set_from'], 7)
+        self.assertEqual(d.get_from(['items', 'get_from', 'set_from']), 7)
+        self.assertTrue(callable(d.items))
+
+    def test_paths_generators_are_consumed_once(self):
+        d = self.dict_class()
+        d.set_from((key for key in ['a', 'b']), 3)
+        self.assertEqual(d.get_from(iter(['a', 'b'])), 3)
+
+    def test_paths_generator_failure_does_not_write(self):
+        def path():
+            yield 'a'
+            raise RuntimeError('broken path')
+
+        d = self.dict_class()
+        with self.assertRaises(RuntimeError):
+            d.set_from(path(), 1)
+        self.assertEqual(d, {})
+
+    def test_paths_empty_path(self):
+        d = self.dict_class(a=1)
+        self.assertIs(d.get_from([]), d)
+        with self.assertRaises(ValueError):
+            d.set_from([], 3)
+        self.assertEqual(d, {'a': 1})
+
+    def test_paths_reject_strings_and_noniterables(self):
+        d = self.dict_class()
+        for path in ('a.b', b'a.b', u'a.b', None, 3):
+            with self.assertRaises(TypeError):
+                d.get_from(path)
+            with self.assertRaises(TypeError):
+                d.set_from(path, 1)
+        self.assertEqual(d, {})
+
+    def test_paths_sequences(self):
+        d = self.dict_class({'rows': [{'value': 1}, {'value': 2}]})
+        self.assertEqual(d.get_from(['rows', -1, 'value']), 2)
+        d.set_from(['rows', 0, 'value'], 3)
+        self.assertEqual(d.rows[0].value, 3)
+        row = {'value': 4}
+        d.set_from(['rows', -1], row)
+        self.assertIs(d.rows[1], row)
+        self.assertEqual(d.get_from(['rows', 2], 'missing'), 'missing')
+        with self.assertRaises(IndexError):
+            d.set_from(['rows', 2], 5)
+        with self.assertRaises(TypeError):
+            d.get_from(['rows', '0'])
+
+    def test_paths_tuples_keep_immutability(self):
+        d = self.dict_class({'rows': ({'value': 1},)})
+        d.set_from(['rows', 0, 'value'], 2)
+        self.assertEqual(d.get_from(['rows', 0, 'value']), 2)
+        with self.assertRaises(TypeError):
+            d.set_from(['rows', 0], 3)
+
+    def test_paths_plain_dicts_keep_indexing_rules(self):
+        d = self.dict_class()
+        raw = {'child': {}}
+        d.raw = raw
+        d.set_from(['raw', 'child', 'leaf'], 1)
+        self.assertEqual(raw, {'child': {'leaf': 1}})
+        self.assertIsNone(d.get_from(['raw', 'missing', 'leaf']))
+        with self.assertRaises(KeyError):
+            d.set_from(['raw', 'missing', 'leaf'], 2)
+        self.assertEqual(raw, {'child': {'leaf': 1}})
+
+    def test_paths_invalid_traversal_keeps_values(self):
+        d = self.dict_class(a=1)
+        with self.assertRaises(TypeError):
+            d.get_from(['a', 'b'])
+        with self.assertRaises(TypeError):
+            d.set_from(['a', 'b'], 2)
+        with self.assertRaises(TypeError):
+            d.set_from(['new', []], 2)
+        self.assertEqual(d, {'a': 1})
+
+    def test_paths_freeze_behavior(self):
+        d = self.dict_class({'a': {'b': 1}})
+        d.freeze()
+        self.assertIsNone(d.get_from(['a', 'missing']))
+        d.set_from(['a', 'b'], 2)
+        for path in (['new'], ['new', 'leaf'], ['a', 'new']):
+            with self.assertRaises(KeyError):
+                d.set_from(path, 3)
+        self.assertEqual(d, {'a': {'b': 2}})
+        d.unfreeze()
+        d.set_from(['a', 'new', 'leaf'], 3)
+        self.assertEqual(d.a.new.leaf, 3)
+
+    def test_paths_respect_missing_override_for_assignment(self):
+        class NoDefault(self.dict_class):
+            def __missing__(self, key):
+                raise KeyError(key)
+
+        d = NoDefault()
+        with self.assertRaises(KeyError):
+            d.set_from(['new', 'leaf'], 1)
+        self.assertEqual(d, {})
+        d.set_from(['new'], 1)
+        self.assertEqual(d.new, 1)
+
+
 class DictTests(unittest.TestCase, AbstractTestsClass):
     dict_class = Dict
 
